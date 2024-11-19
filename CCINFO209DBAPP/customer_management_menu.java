@@ -7,7 +7,7 @@ public class customer_management_menu {
 		
 	}
 	
-	public void menu() {
+	public int menu() {
 		int menuselection;
 		Scanner console = new Scanner(System.in);
 		
@@ -17,22 +17,23 @@ public class customer_management_menu {
 			System.out.println("  ");
 			System.out.println("  ");
 			System.out.println("=======================================================");
-			System.out.println("    Customer Management Menu							   ");
+			System.out.println("    Customer Management Menu							");
 			System.out.println("-------------------------------------------------------");
-			System.out.println("[1] Create a new Customer Record						   ");
-			System.out.println("[2] Update a Customer Record							   ");
-			System.out.println("[3] Delete a Customer Record							   ");
-			System.out.println("[4] View a Customer Record							   ");
-			System.out.println("[0] Exit Customer Management							   ");
+			System.out.println("[1] Create a new Customer Record						");
+			System.out.println("[2] Update a Customer Record							");
+			System.out.println("[3] Delete a Customer Record							");
+			System.out.println("[4] View a Customer Record							   	");
+			System.out.println("[5] View Orders By Customer Record						");
+			System.out.println("[0] Exit Customer Management							");
 			System.out.println("=======================================================");
 			
 			System.out.println("Enter Selected Function: ");
 			menuselection = Integer.parseInt(console.nextLine());
 			
+			customer_management c = new customer_management();
 			switch (menuselection) 
 			{
 				case 1: // Adding a new Records, ask the user for the values of the record fields
-					customer_management c = new customer_management();
 					
 					System.out.println ("Enter product information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();
@@ -48,7 +49,6 @@ public class customer_management_menu {
 					break;
 					
 				case 2:
-					customer_management c = new customer_management();
 					
 					System.out.println ("Enter product information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();
@@ -73,16 +73,15 @@ public class customer_management_menu {
 						System.out.println ("Contact First Name     : ");  c.contact_firstName 	= console.nextLine();
 						System.out.println ("Contact Last Name  	: ");  c.contact_lastName 	= console.nextLine();
 						System.out.println ("Phone Number      		: ");  c.phone_number      	= console.nextLine();
-						System.out.println ("Address Line 1    		: ");  c.addressLine1    	= Integer.parseInt(console.nextLine());
-						System.out.println ("Address Line 2         : ");  c.addressLine2       = Float.parseFloat(console.nextLine());
-						System.out.println ("City                	: ");  c.city 				= Float.parseFloat(console.nextLine());		
+						System.out.println ("Address Line 1    		: ");  c.addressLine1    	= console.nextLine();
+						System.out.println ("Address Line 2         : ");  c.addressLine2       = console.nextLine();
+						System.out.println ("City                	: ");  c.city 				= console.nextLine();		
 					
 						c.update_customer();
 					}
 					break;
 					
-				case 3: 
-					customer_management c = new customer_management();
+				case 3:
 					
 					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();		
@@ -91,7 +90,6 @@ public class customer_management_menu {
 					break;
 					
 				case 4: 
-					customer_management c = new customer_management();
 					
 					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();		
@@ -117,6 +115,7 @@ public class customer_management_menu {
 					break;
 			}  
 		} while (menuselection != 0);
-		
-	}	
+		return menuselection;
+	}
+	
 }
