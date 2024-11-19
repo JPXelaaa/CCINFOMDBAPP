@@ -1,3 +1,4 @@
+//MAY GAGAWIN KA PA SA BABA
 import java.sql.*;
 
 public class customer_management {
@@ -11,7 +12,7 @@ public class customer_management {
 	public String	addressLine2;
 	public String	city;
 	
-	public product_management() {
+	public customer_management() {
 		bookstore_ID 		= "";
 		bookstore_name		= "";
 		contact_firstName 	= "";
@@ -25,25 +26,25 @@ public class customer_management {
 	
 	public int add_customer() {
 		try {
-						
-			Connection conn;
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsales?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+			Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 			System.out.println("Connection to DB Successful");
-			PreparedStatement pstmt = conn.prepareStatement("INSERT INTO products VALUES (?,?,?,?,?,?,?,?)");
+			PreparedStatement pstmt = conn.prepareStatement(
+					"INSERT INTO bookstore (bookstore_ID, bookstore_name, contact_firstName, contact_lastName, phone_number, addressLine1, addressLine2, city) VALUES (?,?,?,?,?,?,?,?)"
+					);
 			pstmt.setString(1, bookstore_ID);
-			pstmt.setString(2, bookstore_name);
+			pstmt.setString(2, bookstore_name); 
 			pstmt.setString(3, contact_firstName);
 			pstmt.setString(4, contact_lastName);
-			pstmt.setString(5, phone_number);
+			pstmt.setString(5, phone_number); 
 			pstmt.setString(6, addressLine1);
-			pstmt.setString(7, addressLine2);
+			pstmt.setString(7, addressLine2); 
 			pstmt.setString(8, city);
 			System.out.println("SQL Statement Prepared");
 			pstmt.executeUpdate();
 			System.out.println("Record was created");
 			pstmt.close();
 			conn.close();
-			return 1;
+			return 1; 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return 0;
@@ -52,10 +53,9 @@ public class customer_management {
 	
 	public int update_customer() {
 		try {
-			Connection conn;
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsales?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+			Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 			System.out.println("Connection to DB Successful");
-			PreparedStatement pstmt = conn.prepareStatement("UPDATE products SET bookstore_name=?, contact_firstName=?, contact_lastName=?, phoneNumber=?, addressLine1=?, addressLine2=?, city=? WHERE bookstore_ID=?");
+			PreparedStatement pstmt = conn.prepareStatement("UPDATE bookstore SET bookstore_name=?, contact_firstName=?, contact_lastName=?, phone_number=?, addressLine1=?, addressLine2=?, city=? WHERE bookstore_ID=?");
 			pstmt.setString(8, bookstore_ID);
 			pstmt.setString(1, bookstore_name);
 			pstmt.setString(2, contact_firstName);
@@ -78,10 +78,9 @@ public class customer_management {
 	
 	public int delete_customer() {
 		try {
-			Connection conn;
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsales?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+			Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 			System.out.println("Connection to DB Successful");
-			PreparedStatement pstmt = conn.prepareStatement("DELETE FROM BookStore WHERE bookstore_ID=?");
+			PreparedStatement pstmt = conn.prepareStatement("DELETE FROM bookstore WHERE bookstore_ID=?");
 			pstmt.setString(1, bookstore_ID);
 			System.out.println("SQL Statement Prepared");
 			pstmt.executeUpdate();
@@ -98,10 +97,9 @@ public class customer_management {
 	public int get_customer() {
 		int recordcount = 0;
 		try {
-			Connection conn;
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbsales?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+			Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 			System.out.println("Connection to DB Successful");
-			PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM BookStore WHERE bookstore_ID=?");
+			PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM bookstore WHERE bookstore_ID=?");
 			pstmt.setString(1, bookstore_ID);
 			System.out.println("SQL Statement Prepared");
 			ResultSet rs = pstmt.executeQuery();
@@ -124,5 +122,11 @@ public class customer_management {
 			return 0;
 		}
 	}
+	
+	/*public int getOrdersByCustomer () {
+		
+		// TO DO THIS
+		
+	}*/
 	
 }
