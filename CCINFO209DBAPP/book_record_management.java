@@ -11,10 +11,10 @@ public class book_record_management {
     public int stockQuantity;
 
     public boolean check_authors(String[] authors) {
-        System.out.println("Connected to the database successfully");
-        String query = "SELECT COUNT(*) FROM Author WHERE pen_name = ?";
-        try (Connection conn = DatabaseConnection.getConnection("")) {
-            for (String author : authors) {
+    String query = "SELECT COUNT(*) FROM author WHERE pen_name = ?";
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+        	System.out.println("Connected to the database successfully");
+        	for (String author : authors) {
                 author = author.trim();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.setString(1, author);
@@ -32,9 +32,9 @@ public class book_record_management {
     }
 
     public boolean check_genres(String[] genres) {
-        String query = "SELECT COUNT(*) FROM BookGenre WHERE genre = ?";
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            for (String genre : genres) {
+        String query = "SELECT COUNT(*) FROM genre WHERE genre = ?";
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+        	for (String genre : genres) {
                 genre = genre.trim();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 stmt.setString(1, genre);
@@ -51,23 +51,26 @@ public class book_record_management {
         return true;
     }
 
-    public void add_book() {
-        String checkPublisherQuery = "SELECT COUNT(*) FROM Publisher WHERE publisher_name = ?";
-        String insertBookQuery = "INSERT INTO books (ISBN, publisher_name, title, publication_year, stock_quantity) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection("your_connection_string_here")) {
+    public void add_book(String[] authors, String[] genres) {
+        String checkPublisherQuery = "SELECT COUNT(*) FROM publisher WHERE publisher_name = ?";
+        String insertBookQuery = "INSERT INTO book (ISBN, title, publisher_name, publication_year, stock_quantity) VALUES (?, ?, ?, ?, ?)";
+        String insertAuthorQuery = "INSERT INTO book_author (pen_name, ISBN) VALUES (?, ?)";
+        String insertGenreQuery = "INSERT INTO book_genre (genre, ISBN) VALUES (?, ?)";
+        
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             System.out.println("Connected to the database successfully");
-
             // Check if publisher exists
             try (PreparedStatement checkPublisherStmt = conn.prepareStatement(checkPublisherQuery)) {
                 checkPublisherStmt.setString(1, publisherName);
                 try (ResultSet rs = checkPublisherStmt.executeQuery()) {
                     if (rs.next() && rs.getInt(1) == 0) {
-                        System.out.println("Error: Publisher ID " + publisherName + " does not exist. Book cannot be added.");
+                        System.out.println("Error: Publisher " + publisherName + " does not exist. Book cannot be added.");
                         return;
                     }
                 }
             }
+            
+       
 
             // Insert the book if publisher exists
             try (PreparedStatement insertBookStmt = conn.prepareStatement(insertBookQuery)) {
@@ -81,6 +84,23 @@ public class book_record_management {
                 insertBookStmt.executeUpdate();
                 System.out.println("Record was created successfully");
             }
+            
+         // Insert updated authors and genres
+            for (String author : authors) {
+                try (PreparedStatement insertAuthorStmt = conn.prepareStatement(insertAuthorQuery)) {
+                    insertAuthorStmt.setString(1, author.trim());
+                    insertAuthorStmt.setInt(2, ISBN);
+                    insertAuthorStmt.executeUpdate();
+                }
+            }
+
+            for (String genre : genres) {
+                try (PreparedStatement insertGenreStmt = conn.prepareStatement(insertGenreQuery)) {
+                    insertGenreStmt.setString(1, genre.trim());
+                    insertGenreStmt.setInt(2, ISBN);
+                    insertGenreStmt.executeUpdate();
+                }
+            }
 
 
 
@@ -93,12 +113,12 @@ public class book_record_management {
 
 
     public void update_book(String[] authors, String[] genres) {
-        String bookUpdateQuery = "UPDATE Book SET ISBN = ?, title = ?, publisher_ID = ?, publication_date = ?, stockQuantity = ? WHERE ISBN = ?";
-        String deleteAuthorsQuery = "DELETE FROM BookAuthor WHERE ISBN = ?";
-        String deleteGenresQuery = "DELETE FROM BookGenre WHERE ISBN = ?";
-        String insertAuthorQuery = "INSERT INTO BookAuthor (pen_name, ISBN) VALUES (?, ?)";
-        String insertGenreQuery = "INSERT INTO BookGenre (ISBN, genre) VALUES (?, ?)";
-        String checkPublisherQuery = "SELECT COUNT(*) FROM Publisher WHERE publisher_name = ?";
+        String bookUpdateQuery = "UPDATE book SET ISBN = ?, title = ?, publisher_name = ?, publication_date = ?, stockQuantity = ? WHERE ISBN = ?";
+        String deleteAuthorsQuery = "DELETE FROM book_author WHERE ISBN = ?";
+        String deleteGenresQuery = "DELETE FROM book_genre WHERE ISBN = ?";
+        String insertAuthorQuery = "INSERT INTO book_author (pen_name, ISBN) VALUES (?, ?)";
+        String insertGenreQuery = "INSERT INTO book_genre (ISBN, genre) VALUES (?, ?)";
+        String checkPublisherQuery = "SELECT COUNT(*) FROM publisher WHERE publisher_name = ?";
 
         // Check if authors and genres exist before proceeding
         if (!check_authors(authors)) {
@@ -110,7 +130,7 @@ public class book_record_management {
             return;
         }
 
-        try (Connection conn = DatabaseConnection.getConnection("")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
 
             // Check if publisher exists
             try (PreparedStatement checkPublisherStmt = conn.prepareStatement(checkPublisherQuery)) {
@@ -170,9 +190,9 @@ public class book_record_management {
 
 
     public void delete_book(){
-        String deleteQuery = "DELETE FROM Book WHERE ISBN = ?";
+        String deleteQuery = "DELETE FROM book WHERE ISBN = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection("")){
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")){
             System.out.println("Connected to the database successfully");
         try (PreparedStatement ps = conn.prepareStatement(deleteQuery)) {
             ps.setInt(1, ISBN);
@@ -192,8 +212,8 @@ public class book_record_management {
 
 
     public boolean get_book() {
-        String getQuery = "SELECT * FROM Book WHERE ISBN = ?";
-        try (Connection conn = DatabaseConnection.getConnection("")) {
+        String getQuery = "SELECT * FROM book WHERE ISBN = ?";
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             try (PreparedStatement ps = conn.prepareStatement(getQuery)) {
                 ps.setInt(1, ISBN);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -216,10 +236,10 @@ public class book_record_management {
 
 
     public String get_authors() {
-        String authorsQuery = "SELECT pen_name FROM BookAuthor WHERE ISBN = ?";
+        String authorsQuery = "SELECT pen_name FROM book_author WHERE ISBN = ?";
         StringBuilder authors = new StringBuilder();
 
-        try (Connection conn = DatabaseConnection.getConnection("")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             try (PreparedStatement ps = conn.prepareStatement(authorsQuery)) {
                 ps.setInt(1, ISBN);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -239,12 +259,11 @@ public class book_record_management {
         return authors.length() > 0 ? authors.toString() : "No authors found";
     }
 
-
     public String get_genres() {
-        String genresQuery = "SELECT genre FROM BookGenre WHERE ISBN = ?";
+        String genresQuery = "SELECT genre FROM book_genre WHERE ISBN = ?";
         StringBuilder genres = new StringBuilder();
 
-        try (Connection conn = DatabaseConnection.getConnection("")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             try (PreparedStatement ps = conn.prepareStatement(genresQuery)) {
                 ps.setInt(1, ISBN);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -260,9 +279,6 @@ public class book_record_management {
             System.out.println("Error retrieving genres: " + e.getMessage());
             e.printStackTrace();
         }
-
         return genres.length() > 0 ? genres.toString() : "No genres found";
     }
-
-
 }
