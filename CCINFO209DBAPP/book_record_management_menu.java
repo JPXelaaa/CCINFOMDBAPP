@@ -41,13 +41,13 @@ public class book_record_management_menu {
                     System.out.println("Genres: (comma-separated)");
                     String[] genres = sc.nextLine().split(",");
 
-                    System.out.println("Publisher:");                   bm.publisherName          = sc.nextLine();
+                    System.out.println("Publisher:");                   bm.publisherName        = sc.nextLine();
                     System.out.println("Publication Year (YYYY):");     bm.publicationYear      = Integer.parseInt(sc.nextLine());
                     System.out.println("Stock Quantity:");              bm.stockQuantity        = Integer.parseInt(sc.nextLine());
 
 
                     if(bm.check_authors(authors) && bm.check_genres(genres)){
-                        bm.add_book();
+                        bm.add_book(authors, genres);
                     } else {
                         System.out.println("Author or Genre does not exist. Book addition aborted.");
                     }
@@ -108,12 +108,13 @@ public class book_record_management_menu {
                     bm.ISBN = Integer.parseInt(sc.nextLine());
 
                     bm.delete_book();
+                    break;
 
                 case 4:
                     bm = new book_record_management();
 
                     System.out.println("Enter Book Information");
-                    System.out.println("Book ID     :");
+                    System.out.println("ISBN     :");
                     bm.ISBN = Integer.parseInt(sc.nextLine());
 
                     bm.get_book();
@@ -126,7 +127,9 @@ public class book_record_management_menu {
                     System.out.println("Publisher           :" + bm.publisherName);
                     System.out.println("Publication Year    :" + bm.publicationYear);
                     System.out.println("Stock Quantity      :" + bm.stockQuantity);
-
+                    
+                    break;
+                    
                 default:
                     System.out.println("Invalid Selection");
             }
