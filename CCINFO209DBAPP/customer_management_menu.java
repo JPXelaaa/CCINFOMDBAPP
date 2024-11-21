@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.Scanner;
 
 public class customer_management_menu {
