@@ -22,7 +22,6 @@ public class customer_management_menu {
 			System.out.println("[2] Update a Customer Record							");
 			System.out.println("[3] Delete a Customer Record							");
 			System.out.println("[4] View a Customer Record							   	");
-			System.out.println("[5] View Orders By Customer Record						");
 			System.out.println("[0] Exit Customer Management							");
 			System.out.println("=======================================================");
 			
