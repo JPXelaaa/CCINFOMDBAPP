@@ -1,4 +1,3 @@
-//MAY GAGAWIN KA PA SA BABA
 import java.sql.*;
 
 public class customer_management {
@@ -122,11 +121,4 @@ public class customer_management {
 			return 0;
 		}
 	}
-	
-	/*public int getOrdersByCustomer () {
-		
-		// TO DO THIS
-		
-	}*/
-	
 }
