@@ -13,7 +13,7 @@ public class sales_of_books_menu {
         Scanner sc = new Scanner(System.in);
         
         
-        while(menuSelection != 5) {
+        while(menuSelection != 4) {
         	
         	System.out.println(" ");
             System.out.println(" ");
@@ -64,7 +64,7 @@ public class sales_of_books_menu {
                     System.out.println("    Please Select Information						   ");
                     System.out.println("-------------------------------------------------------");
                     System.out.println("[1] View Book Purchase						        ");
-                    System.out.println("[1] View Publisher Purchase						    ");
+                    System.out.println("[2] View Publisher Purchase						    ");
                     
                     System.out.println("Enter Selected Function: ");
                     viewSelection = Integer.parseInt(scv.nextLine());
@@ -110,22 +110,22 @@ public class sales_of_books_menu {
             		sb = new sales_of_books();
 
             		System.out.println("Enter Purchase Information:");
-                    System.out.println("Order Number:");                    sb.order_number                 = sc.nextLine();
-                    System.out.println("Staus:");                      		  sb.status                       = sc.nextLine();
+                    System.out.println("Order Number:");                      	  sb.order_number                 = sc.nextLine();
+                    System.out.println("Status:");                      		  sb.status                       = sc.nextLine();
 
                     sb.updateOrderStatus(sb.order_number, sb.status);
-
+                    
+            	case 4:
+            		
+            		break;
             	default:
                     System.out.println("Invalid Selection");
             }
         	
         }
-        
+     
 		
-		
-		
-		
-		return 0;
+        return menuSelection;
 		
 	}
 }
