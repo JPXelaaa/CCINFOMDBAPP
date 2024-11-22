@@ -6,8 +6,8 @@ public class returnProcess {
 	public String	return_date; 
 	public String	return_reason;
 	public String	bookstore_ID;
-	
-	public int		ISBN;
+	public int		book_ID;
+	public int		publisher_ID;
 	public int 		quantity_returned;
 	
 	public returnProcess() {
@@ -16,89 +16,121 @@ public class returnProcess {
 		return_reason		= "";
 		bookstore_ID 		= "";
 				
-		ISBN				= 0;
+		book_ID				= 0;
+		publisher_ID		= 0;
 		quantity_returned	= 0;
 	}
-	
-	
-	// all functions below are for return table
+		
+	public int returnIDChoice() {
+	   	 try {
+	            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	            
+	            PreparedStatement checkStmt = conn.prepareStatement(
+	                "SELECT COUNT(*) AS count FROM returns WHERE return_ID=?"
+	            );
+	            checkStmt.setString(1, return_ID);
+	            ResultSet r = checkStmt.executeQuery();
+	            r.next();
+	            int count = r.getInt("count");
+	            r.close();
+	            checkStmt.close();
+
+	            if (count == 0) {
+	                System.out.println("Return Record does not exist in the database. Update terminated.");
+	                conn.close();
+	                return 0;
+	            } 
+	            
+	            return 1;
+	   	 } catch (Exception e) {
+	   		 System.out.println(e.getMessage());
+	   		 return 0;
+	   	 }
+	   }
+		
 		public int add_returnRecord() {
-			try {
+			try {		
 				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 				System.out.println("Connection to DB Successful");
 				PreparedStatement pstmt = conn.prepareStatement(
-						"INSERT INTO return (return_ID, return_date, return_reason, bookstore_ID) VALUES (?,?,?,?)"
-						);
-				pstmt.setString(1, return_ID);
-				pstmt.setString(2, return_date);
-				pstmt.setString(3, return_reason); 
-				pstmt.setString(4, bookstore_ID);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was created");
-				pstmt.close();
-				conn.close();
-				return 1; 
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
+		                "INSERT INTO returns (return_ID, return_date, return_reason, bookstore_ID) VALUES (?, CURDATE(), ?, ?)");
+		        pstmt.setString(1, return_ID);
+		        pstmt.setString(2, return_reason);
+		        pstmt.setString(3, bookstore_ID);
+		        pstmt.executeUpdate(); 
+				
+		        PreparedStatement dStmt = conn.prepareStatement(
+		                "INSERT INTO return_details (return_ID, book_ID, publisher_ID, quantity_returned) VALUES (?, ?, ?, ?)");
+		        dStmt.setString(1, return_ID);
+		        dStmt.setInt(2, book_ID);
+		        dStmt.setInt(3, publisher_ID);
+		        dStmt.setInt(4, quantity_returned);
+		        dStmt.executeUpdate();
+		        
+		        PreparedStatement updateStmt = conn.prepareStatement(
+		                "UPDATE publisher_books SET stock_quantity = stock_quantity + ? WHERE book_ID = ? AND publisher_ID = ?");
+		        updateStmt.setInt(1, quantity_returned);
+		        updateStmt.setInt(2, book_ID);
+		        updateStmt.setInt(3, publisher_ID);
+		        updateStmt.executeUpdate();
+
+		        System.out.println("Return Record and Details were created, and stock updated");
+		        pstmt.close();
+		        dStmt.close();
+		        updateStmt.close();
+		        conn.close();
+		        return 1;
+		    } catch (Exception e) {
+		        System.out.println(e.getMessage());
+		        return 0;
+		    }
 		}
 		
-		public int update_returnRecord() {
-			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("UPDATE return SET return_date=?, return_reason=?, bookstore_ID=? WHERE return_ID=?");
-				
-				pstmt.setString(1, return_date);
-				pstmt.setString(2, return_reason);
-				pstmt.setString(3, bookstore_ID);
-				pstmt.setString(4, return_ID);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was updated");
-				pstmt.close();
-				conn.close();
-				return 1;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}
 		
 		public int delete_returnRecord() {
 			try {
 				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("DELETE FROM return WHERE return_ID=?");
-				pstmt.setString(1, return_ID);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was deleted");
-				pstmt.close();
-				conn.close();
-				return 1;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
+				
+				PreparedStatement dStmt = conn.prepareStatement("DELETE FROM return_details WHERE return_ID = ?");
+			    dStmt.setString(1, return_ID);
+			    dStmt.executeUpdate();
+			    
+			    PreparedStatement pstmt = conn.prepareStatement("DELETE FROM returns WHERE return_ID = ?");
+		        pstmt.setString(1, return_ID);
+		        pstmt.executeUpdate();
+			        
+		        System.out.println("Return Record and Details were deleted");
+		        dStmt.close();
+		        pstmt.close();
+		        conn.close();
+		        return 1;
+		    } catch (Exception e) {
+		        System.out.println(e.getMessage());
+		        return 0;
 			}
 		}
 		
-		public int get_returnRecord() {
+		public int get_returnRecordByBook() {
 			int recordcount = 0;
 			try {
 				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM return WHERE return_ID=?");
-				pstmt.setString(1, return_ID);
+				
+				 PreparedStatement pstmt = conn.prepareStatement(
+			                "SELECT r.return_ID, r.return_date, r.return_reason, rd.quantity_returned " 
+			                + "FROM returns r JOIN return_details rd ON r.return_ID = rd.return_ID " 
+			                + "WHERE rd.book_ID = ?");
+			        pstmt.setInt(1, book_ID);
+			        
 				System.out.println("SQL Statement Prepared");
 				ResultSet rs = pstmt.executeQuery();
 				while (rs.next()) {
 					recordcount++;
+					return_ID		   = rs.getString("return_ID");
 					return_date 	   = rs.getString("return_date");
 					return_reason  	   = rs.getString("return_reason");
-					bookstore_ID       = rs.getString("bookstore_ID");
+					quantity_returned  = rs.getInt("quantity_returned");
 					
 					System.out.println("Record was Retrieved");
 				}
@@ -111,82 +143,28 @@ public class returnProcess {
 			}
 		}
 		
-		// all functions below are for return_details table
-		public int add_orderDetails() {
-			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement(
-						"INSERT INTO return_details (return_ID, ISBN, quantity_returned) VALUES (?,?,?)"
-						);
-				pstmt.setString(1, return_ID);
-				pstmt.setInt(2, ISBN);
-				pstmt.setInt(3, quantity_returned); 
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was created");
-				pstmt.close();
-				conn.close();
-				return 1; 
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}
-		
-		public int update_orderDetails() {
-			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("UPDATE return_details SET quantity_returned=? WHERE return_ID=? AND ISBN=?");
-				
-				pstmt.setInt(1, quantity_returned);
-				pstmt.setString(2, return_ID);
-				pstmt.setInt(3, ISBN);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was updated");
-				pstmt.close();
-				conn.close();
-				return 1;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}
-		
-		public int delete_returnDetails() {
-			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("DELETE FROM return_details WHERE return_ID=? AND ISBN=?");
-				pstmt.setString(1, return_ID);
-				pstmt.setInt(2, ISBN);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Record was deleted");
-				pstmt.close();
-				conn.close();
-				return 1;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}
-		
-		public int get_returnDetails() {
+		public int get_returnRecordByPublisher() {
 			int recordcount = 0;
 			try {
 				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
 				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM return_details WHERE return_ID=? AND ISBN=?");
-				pstmt.setString(1, return_ID);
-				pstmt.setInt(2, ISBN);
+
+				PreparedStatement pstmt = conn.prepareStatement(
+		                "SELECT r.return_ID, r.return_date, rd.book_ID, r.return_reason, rd.quantity_returned " 
+		                + "FROM returns r JOIN return_details rd ON r.return_ID = rd.return_ID " 
+		                + "WHERE rd.publisher_ID = ?");
+		        pstmt.setInt(1, publisher_ID);
+		        
 				System.out.println("SQL Statement Prepared");
 				ResultSet rs = pstmt.executeQuery();
 				while (rs.next()) {
 					recordcount++;
-					quantity_returned	   	= rs.getInt("quantity_returned");
+					return_ID		   = rs.getString("return_ID");
+					return_date 	   = rs.getString("return_date");
+					book_ID			   = rs.getInt("book_ID");
+					return_reason  	   = rs.getString("return_reason");
+					quantity_returned  = rs.getInt("quantity_returned");
+					
 					System.out.println("Record was Retrieved");
 				}
 				pstmt.close();
@@ -196,7 +174,6 @@ public class returnProcess {
 				System.out.println(e.getMessage());
 				return 0;
 			}
-		}
-		
+		}		
 }
 
