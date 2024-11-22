@@ -18,7 +18,8 @@ public class returnProcess_menu {
 			System.out.println("[1] Process a Return for a Book							");
 			System.out.println("[2] View Return Information of a Book					");
 			System.out.println("[3] View Return Information of a Publisher				");
-			System.out.println("[4] Delete a Return Record							   	");
+			System.out.println("[4] Update a Return Status");
+			System.out.println("[5] Delete a Return Record");
 			System.out.println("[0] Exit Customer Management							");
 			System.out.println("=======================================================");
 			
@@ -81,8 +82,16 @@ public class returnProcess_menu {
 						return 0;
 					
 					break;
-					
+				
 				case 4:
+					System.out.println ("Enter Return information");
+					System.out.println ("Return ID	: ");  rp.return_ID = console.nextLine();	
+					System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
+					
+					rp.update_returnRecord();
+					break;
+					
+				case 5:
 					
 					System.out.println ("Enter return information");
 					System.out.println ("Return ID        : ");  rp.return_ID  = console.nextLine();		
