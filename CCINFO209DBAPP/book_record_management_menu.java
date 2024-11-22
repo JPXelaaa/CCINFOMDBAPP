@@ -32,7 +32,13 @@ public class book_record_management_menu {
             switch (menuSelection) {
                 case 1:
                     book_record_management bm = new book_record_management();
+                    System.out.println("Would you like to see existing Book IDs? (y/n): ");
+                    if (sc.nextLine().equalsIgnoreCase("y")) {
+                    	bm.displayExistingBookIDs();
+                        System.out.println(" ");
+                        System.out.println(" ");
 
+                    }
                     System.out.println("Enter Book Information:");
                     System.out.println("BookID:");                      bm.bookID               = Integer.parseInt(sc.nextLine());
                     System.out.println("Title:");                       bm.title                = sc.nextLine();
@@ -54,6 +60,13 @@ public class book_record_management_menu {
 
                 case 2:
                     bm = new book_record_management();
+                    System.out.println("Would you like to see existing Book IDs? (y/n): ");
+                    if (sc.nextLine().equalsIgnoreCase("y")) {
+                    	bm.displayExistingBookIDs();
+                        System.out.println(" ");
+                        System.out.println(" ");
+
+                    }
                     System.out.println("Enter Book Information:");
                     System.out.println("BookID     :");                 bm.bookID = Integer.parseInt(sc.nextLine());
 
@@ -66,11 +79,10 @@ public class book_record_management_menu {
                         System.out.println("Title               :" + bm.title);
                         System.out.println("Author              :" + bm.get_authors());
                         System.out.println("Genre               :" + bm.get_genres());
-                        System.out.println("Year Written    	:" + bm.yearWritten);
+                        System.out.println("Year Written   		:" + bm.yearWritten);
+                        System.out.println("-------------------------------------------------------");
 
                         System.out.println("Enter Updated Book Information");
-                        System.out.println("-------------------------------------------------------");
-                        System.out.println("BookID              : ");       bm.bookID = Integer.parseInt(sc.nextLine());
                         System.out.println("Title               : ");         bm.title = sc.nextLine();
 
 
@@ -97,6 +109,13 @@ public class book_record_management_menu {
                     break;
                 case 3:
                     bm = new book_record_management();
+                    System.out.println("Would you like to see existing Book IDs? (y/n): ");
+                    if (sc.nextLine().equalsIgnoreCase("y")) {
+                    	bm.displayExistingBookIDs();
+                        System.out.println(" ");
+                        System.out.println(" ");
+
+                    }
 
                     System.out.println("Enter Book Information");
                     System.out.println("BookID     :");
@@ -107,6 +126,13 @@ public class book_record_management_menu {
 
                 case 4:
                     bm = new book_record_management();
+                    System.out.println("Would you like to see existing Book IDs? (y/n): ");
+                    if (sc.nextLine().equalsIgnoreCase("y")) {
+                    	bm.displayExistingBookIDs();
+                        System.out.println(" ");
+                        System.out.println(" ");
+
+                    }
 
                     System.out.println("Enter Book Information");
                     System.out.println("BookID     :");
@@ -124,9 +150,11 @@ public class book_record_management_menu {
                     System.out.println("Title               :" + bm.title);
                     System.out.println("Author              :" + bm.get_authors());
                     System.out.println("Genre               :" + bm.get_genres());
-                    System.out.println("Year Written    	:" + bm.yearWritten);                    
+                    System.out.println("Year Written        :" + bm.yearWritten);                    
                     break;
-                    
+                 
+                case 5:
+                	break;
                 default:
                     System.out.println("Invalid Selection");
             }
