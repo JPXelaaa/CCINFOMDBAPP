@@ -128,7 +128,7 @@ public class sales_of_books {
 		        checkStatusStmt.setString(1, this.status);
 		        ResultSet statusRs = checkStatusStmt.executeQuery();
 		        if (statusRs.next() && statusRs.getInt(1) == 0) {
-		            System.out.println("Error: Status 'processing' does not exist in REF_status table. Aborting order creation.");
+		            System.out.println("Error: Status does not exist in REF_status table. Aborting order creation.");
 		            return;
 		        }
 		        
@@ -241,56 +241,64 @@ public class sales_of_books {
 	
 	
 	public void viewOrdersByBook(int bookID) {
-		String query 					= "SELECT o.order_number, o.order_date, o.status, od.quantity_ordered " 
-										+ "FROM orders o " 
-										+ "JOIN order_details od ON o.order_number = od.order_number " 
-										+ "WHERE od.book_ID = ?";
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, bookID);
-            ResultSet rs = stmt.executeQuery();
+	    String query 						= "SELECT o.order_number, o.order_date, o.status, od.quantity_ordered, bs.bookstore_name " 
+	    									+ "FROM orders o JOIN order_details od ON o.order_number = od.order_number " 
+	    									+ "JOIN publisher_books pb ON od.book_ID = pb.book_ID " 
+	    									+ "JOIN bookstores bs ON o.bookstore_ID = bs.bookstore_ID " 
+	    									+ "WHERE pb.book_ID = ?";
 
-            System.out.printf("%-15s %-15s %-15s %-15s\n", "Order Number", "Order Date", "Status", "Quantity Ordered");
-            System.out.println("-------------------------------------------------------------");
 
-            while (rs.next()) {
-                System.out.printf("%-15s %-15s %-15s %-15d\n",
-                        rs.getString("order_number"),
-                        rs.getString("order_date"),
-                        rs.getString("status"),
-                        rs.getInt("quantity_ordered"));
-            }
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        stmt.setInt(1, bookID);
+	        ResultSet rs = stmt.executeQuery();
 
-            stmt.close();
-            conn.close();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+	        System.out.printf("%-15s %-20s %-15s %-20s %-35s\n", 
+	                          "Order Number", "Order Date", "Status", "Quantity Ordered", "Bookstore Name");
+	        System.out.println("-----------------------------------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            System.out.printf("%-15s %-20s %-15s %-15d %-30s\n",
+	                              rs.getString("order_number"),
+	                              rs.getString("order_date"),
+	                              rs.getString("status"),
+	                              rs.getInt("quantity_ordered"),
+	                              rs.getString("bookstore_name"));
+	        }
+
+	        stmt.close();
+	        conn.close();
+	    } catch (Exception e) {
+	        System.out.println("Error: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
 	
 	public void viewOrdersByPublisher(int publisherID) {
-        String query 				   = "SELECT o.order_number, o.order_date, o.status, od.quantity_ordered, od.book_ID " 
-        							   + "FROM orders o " 
-        							   + "JOIN order_details od ON o.order_number = od.order_number " 
-        							   + "JOIN publisher_books pb ON od.book_ID = pb.book_ID " 
-        							   + "WHERE pb.publisher_ID = ?";
+        String query 				   = "SELECT o.order_number, o.order_date, o.status, od.quantity_ordered, pb.book_ID, bs.bookstore_name " 
+        								+ "FROM orders o " 
+        								+ "JOIN order_details od ON o.order_number = od.order_number " 
+        								+ "JOIN publisher_books pb ON od.book_ID = pb.book_ID " 
+        								+ "JOIN bookstores bs ON o.bookstore_ID = bs.bookstore_ID " 
+        								+ "WHERE pb.publisher_ID = ?";
         
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setInt(1, publisherID);
             ResultSet rs = stmt.executeQuery();
 
-            System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", "Order Number", "Order Date", "Status", "Book ID", "Quantity Ordered");
-            System.out.println("--------------------------------------------------------------------------");
+            System.out.printf("%-15s %-20s %-15s %-15s %-20s %-35s\n", 
+                              "Order Number", "Order Date", "Status", "Book ID", "Quantity Ordered", "Bookstore Name");
+            System.out.println("----------------------------------------------------------------------------------------------------");
 
             while (rs.next()) {
-                System.out.printf("%-15s %-15s %-15s %-15d %-15d\n",
-                        rs.getString("order_number"),
-                        rs.getString("order_date"),
-                        rs.getString("status"),
-                        rs.getInt("book_ID"),
-                        rs.getInt("quantity_ordered"));
+                System.out.printf("%-15s %-20s %-15s %-15d %-15d %-30s\n",
+                                  rs.getString("order_number"),
+                                  rs.getString("order_date"),
+                                  rs.getString("status"),
+                                  rs.getInt("book_ID"),
+                                  rs.getInt("quantity_ordered"),
+                                  rs.getString("bookstore_name"));
             }
 
             stmt.close();
