@@ -11,7 +11,9 @@ public class book_record_management_menu {
     public int menu(){
         int menuSelection = 0;
         Scanner sc = new Scanner(System.in);
-
+        
+        while(menuSelection != 5) {
+        	
         System.out.println(" ");
         System.out.println(" ");
         System.out.println("=======================================================");
@@ -26,13 +28,13 @@ public class book_record_management_menu {
         System.out.println("Enter Selected Function: ");
         menuSelection = Integer.parseInt(sc.nextLine());
 
-        while(menuSelection != 5) {
+        
             switch (menuSelection) {
                 case 1:
                     book_record_management bm = new book_record_management();
 
                     System.out.println("Enter Book Information:");
-                    System.out.println("ISBN:");                        bm.ISBN                 = Integer.parseInt(sc.nextLine());
+                    System.out.println("BookID:");                      bm.bookID               = Integer.parseInt(sc.nextLine());
                     System.out.println("Title:");                       bm.title                = sc.nextLine();
 
                     System.out.println("Authors (comma-separated):");
@@ -41,10 +43,7 @@ public class book_record_management_menu {
                     System.out.println("Genres: (comma-separated)");
                     String[] genres = sc.nextLine().split(",");
 
-                    System.out.println("Publisher:");                   bm.publisherName        = sc.nextLine();
-                    System.out.println("Publication Year (YYYY):");     bm.publicationYear      = Integer.parseInt(sc.nextLine());
-                    System.out.println("Stock Quantity:");              bm.stockQuantity        = Integer.parseInt(sc.nextLine());
-
+                    System.out.println("Year Written (YYYY):");     	bm.yearWritten      = Integer.parseInt(sc.nextLine());
 
                     if(bm.check_authors(authors) && bm.check_genres(genres)){
                         bm.add_book(authors, genres);
@@ -56,25 +55,23 @@ public class book_record_management_menu {
                 case 2:
                     bm = new book_record_management();
                     System.out.println("Enter Book Information:");
-                    System.out.println("ISBN     :");                   bm.ISBN = Integer.parseInt(sc.nextLine());
+                    System.out.println("BookID     :");                 bm.bookID = Integer.parseInt(sc.nextLine());
 
                     if (!bm.get_book()) {
                         System.out.println("That product does not exist on the records");
                     } else {
                         System.out.println("Current Book Information");
                         System.out.println("-------------------------------------------------------");
-                        System.out.println("ISBN             :" + bm.ISBN);
+                        System.out.println("bookID              :" + bm.bookID);
                         System.out.println("Title               :" + bm.title);
                         System.out.println("Author              :" + bm.get_authors());
                         System.out.println("Genre               :" + bm.get_genres());
-                        System.out.println("Publisher           :" + bm.publisherName);
-                        System.out.println("Publication Year    :" + bm.publicationYear);
-                        System.out.println("Stock Quantity      :" + bm.stockQuantity);
+                        System.out.println("Year Written    	:" + bm.yearWritten);
 
                         System.out.println("Enter Updated Book Information");
                         System.out.println("-------------------------------------------------------");
-                        System.out.println("ISBN                : ");       bm.ISBN = Integer.parseInt(sc.nextLine());
-                        System.out.println("Title               : ");       bm.title = sc.nextLine();
+                        System.out.println("BookID              : ");       bm.bookID = Integer.parseInt(sc.nextLine());
+                        System.out.println("Title               : ");         bm.title = sc.nextLine();
 
 
                         System.out.println("Authors (comma-separated, must already exist): ");
@@ -93,10 +90,8 @@ public class book_record_management_menu {
                         }
 
 
-                        System.out.println("Publisher           : ");       bm.publisherName = sc.nextLine();
-                        System.out.println("Publication Year    : ");       bm.publicationYear = Integer.parseInt(sc.nextLine());
-                        System.out.println("Stock Quantity      : ");       bm.stockQuantity = Integer.parseInt(sc.nextLine());
-
+                        System.out.println("Year Written   : ");       bm.yearWritten = Integer.parseInt(sc.nextLine());
+                        
                         bm.update_book(updatedAuthors, updatedGenres);
                     }
                     break;
@@ -104,8 +99,8 @@ public class book_record_management_menu {
                     bm = new book_record_management();
 
                     System.out.println("Enter Book Information");
-                    System.out.println("ISBN     :");
-                    bm.ISBN = Integer.parseInt(sc.nextLine());
+                    System.out.println("BookID     :");
+                    bm.bookID = Integer.parseInt(sc.nextLine());
 
                     bm.delete_book();
                     break;
@@ -114,20 +109,22 @@ public class book_record_management_menu {
                     bm = new book_record_management();
 
                     System.out.println("Enter Book Information");
-                    System.out.println("ISBN     :");
-                    bm.ISBN = Integer.parseInt(sc.nextLine());
+                    System.out.println("BookID     :");
+                    bm.bookID = Integer.parseInt(sc.nextLine());
+                    
+                    if (!bm.check_book(bm.bookID)) {
+                        System.out.println("Book does not exist. Update aborted.");
+                        break;
+                    }
 
                     bm.get_book();
                     System.out.println("Current Book Information");
                     System.out.println("-------------------------------------------------------");
-                    System.out.println("ISBN                :" + bm.ISBN);
+                    System.out.println("BookID              :" + bm.bookID);
                     System.out.println("Title               :" + bm.title);
                     System.out.println("Author              :" + bm.get_authors());
                     System.out.println("Genre               :" + bm.get_genres());
-                    System.out.println("Publisher           :" + bm.publisherName);
-                    System.out.println("Publication Year    :" + bm.publicationYear);
-                    System.out.println("Stock Quantity      :" + bm.stockQuantity);
-                    
+                    System.out.println("Year Written    	:" + bm.yearWritten);                    
                     break;
                     
                 default:
