@@ -100,7 +100,7 @@ public class book_record_management {
                 }
             }
 
-
+       
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -111,7 +111,7 @@ public class book_record_management {
 
 
     public void update_book(String[] authors, String[] genres) {
-        String bookUpdateQuery 		= "UPDATE books SET book_ID = ?, title = ?, year_written = ? WHERE book_ID = ?";
+        String bookUpdateQuery 		= "UPDATE books SET title = ?, year_written = ? WHERE book_ID = ?";
         String deleteAuthorsQuery 	= "DELETE FROM book_authors WHERE book_ID = ?";
         String deleteGenresQuery 	= "DELETE FROM book_genres WHERE book_ID = ?";
         String insertAuthorQuery 	= "INSERT INTO book_authors (pen_name, book_ID) VALUES (?, ?)";
@@ -128,13 +128,12 @@ public class book_record_management {
 
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
             System.out.println("Connected to the database successfully");
-    
+
             // Update book information
             PreparedStatement updateStmt = conn.prepareStatement(bookUpdateQuery);
-            updateStmt.setInt(1, bookID);
-            updateStmt.setString(2, title);
-            updateStmt.setInt(3, yearWritten);
-            updateStmt.setInt(4, bookID); 
+            updateStmt.setString(1, title);
+            updateStmt.setInt(2, yearWritten);
+            updateStmt.setInt(3, bookID);
             updateStmt.executeUpdate();
 
             // Delete existing authors and genres links
@@ -174,6 +173,7 @@ public class book_record_management {
 
 
     public void delete_book(){
+        String deletePublisherBooksQuery = "DELETE FROM publisher_books WHERE book_ID = ?";
         String deleteQuery 			= "DELETE FROM books WHERE book_ID = ?";
         String deleteAuthorsQuery 	= "DELETE FROM book_authors WHERE book_ID = ?";
         String deleteGenresQuery 	= "DELETE FROM book_genres WHERE book_ID = ?";
@@ -181,7 +181,10 @@ public class book_record_management {
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")){
             System.out.println("Connected to the database successfully");
             
-            
+            PreparedStatement deletePublisherBooksStmt = conn.prepareStatement(deletePublisherBooksQuery);
+            deletePublisherBooksStmt.setInt(1, bookID);
+            deletePublisherBooksStmt.executeUpdate();
+
             PreparedStatement deleteAuthorsStmt = conn.prepareStatement(deleteAuthorsQuery);
             deleteAuthorsStmt.setInt(1, bookID);
             deleteAuthorsStmt.executeUpdate();
@@ -279,4 +282,26 @@ public class book_record_management {
         }
         return genres.length() > 0 ? genres.toString() : "No genres found";
     }
+    
+    
+    public void displayExistingBookIDs() {
+	    String query 				  = "SELECT book_ID, title FROM books";
+
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        ResultSet rs = stmt.executeQuery();
+
+	        System.out.printf("%-10s %-50s\n", "Book ID", "Title");
+	        System.out.println("------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            System.out.printf("%-10d %-50s\n", rs.getInt("book_ID"), rs.getString("title"));
+	        }
+
+	        stmt.close();
+	        conn.close();
+	    } catch (Exception e) {
+	        System.out.println("Error retrieving Book IDs and Titles: " + e.getMessage());
+	    }
+	}
 }
