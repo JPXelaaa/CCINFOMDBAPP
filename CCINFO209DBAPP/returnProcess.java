@@ -51,26 +51,53 @@ public class returnProcess {
 	   }
 		*/
 		public int add_returnRecord() {
-			try {		
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				PreparedStatement pstmt = conn.prepareStatement(
-		                "INSERT INTO returns (return_ID, return_date, return_reason, return_status, bookstore_ID) VALUES (?, CURDATE(), ?, PROCESSING, ?)");
-		        pstmt.setString(1, return_ID);
+			this.return_status = "P"; // default status of returned books
+
+		    try {
+		        Connection conn = DriverManager.getConnection(
+		                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+		        System.out.println("Connection to DB Successful");
+
+		        PreparedStatement pstmt = conn.prepareStatement(
+		                "INSERT INTO returns (return_ID, return_date, return_reason, bookstore_ID, return_status) VALUES (?, CURDATE(), ?, ?, ?)");
+		        pstmt.setString(1, return_ID); 
 		        pstmt.setString(2, return_reason);
 		        pstmt.setString(3, bookstore_ID);
-		        pstmt.executeUpdate(); 
-				
+		        pstmt.setString(4, this.return_status); 
+		        pstmt.executeUpdate();
+		        
+		        System.out.println("Return record added to table");
+		        
+		        pstmt.close();
+		        PreparedStatement validateStmt = conn.prepareStatement(
+		                "SELECT quantity_ordered FROM order_details WHERE book_ID = ? AND publisher_ID = ?");
+		        validateStmt.setInt(1, book_ID);
+		        validateStmt.setInt(2, publisher_ID);
+		        ResultSet rs = validateStmt.executeQuery();
+
+		        int quantityOrdered = 0;
+		        if (rs.next()) {
+		            quantityOrdered = rs.getInt("quantity_ordered");
+		        }
+		        rs.close();
+		        validateStmt.close();
+
+		        if (quantity_returned > quantityOrdered) {
+		            System.out.println("Error: Quantity returned exceeds the quantity ordered.");
+		            conn.close();
+		            return 0; 
+		        }
+
 		        PreparedStatement dStmt = conn.prepareStatement(
-		                "INSERT INTO return_details (return_ID book_ID, publisher_ID, quantity_returned) VALUES (?, ?, ?, ?)");
-		        dStmt.setString(1, return_ID);
+		                "INSERT INTO return_details (return_ID, book_ID, publisher_ID, quantity_returned) VALUES (?, ?, ?, ?)");
+		        dStmt.setString(1, return_ID); 
 		        dStmt.setInt(2, book_ID);
 		        dStmt.setInt(3, publisher_ID);
-		        dStmt.setInt(4, quantity_returned);
+		        dStmt.setInt(4, quantity_returned); 
 		        dStmt.executeUpdate();
+
 		        
 		        System.out.println("Return Record and Details were created, and stock updated");
-		        pstmt.close();
 		        dStmt.close();
 		        conn.close();
 		        return 1;
@@ -82,17 +109,19 @@ public class returnProcess {
 		
 		public int update_returnRecord() {
 			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-		
-				PreparedStatement pstmt = conn.prepareStatement("UPDATE returns SET return_status=? WHERE return_ID=?");
-				pstmt.setString(1, return_status);
-				pstmt.setString(2, return_ID);
-				System.out.println("SQL Statement Prepared");
-				pstmt.executeUpdate();
-				System.out.println("Return Record has been updated");
-				pstmt.close();
-				conn.close();
+				Connection conn = DriverManager.getConnection(
+		                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+		        System.out.println("Connection to DB Successful");
+
+		        PreparedStatement pstmt = conn.prepareStatement("UPDATE returns SET return_status = ? WHERE return_ID = ?");
+		        pstmt.setString(1, return_status); 
+		        pstmt.setString(2, return_ID);    
+		        pstmt.executeUpdate();
+
+		        System.out.println("Return Record has been updated with valid status.");
+		        pstmt.close();
+		        conn.close();
+
 				return 1;
 				
 			} catch (Exception e) {
@@ -139,9 +168,11 @@ public class returnProcess {
 			                + "		r.return_date, "
 			                + "		r.return_reason, "
 			                + "		r.return_status,"
-			                + "		rd.quantity_returned" 
-			                + "FROM returns r 		JOIN return_details rd ON r.return_ID = rd.return_ID " 
-			                + "WHERE rd.book_ID = ?");
+			                + "		rd.quantity_returned " 
+			                + "FROM returns r      JOIN return_details rd ON r.return_ID = rd.return_ID"
+			                + "                    JOIN publisher_books pb ON rd.book_ID = pb.book_ID"
+			                + "                    JOIN books b ON rd.book_ID = b.book_ID "
+			                + "WHERE b.book_ID = ?");
 			        pstmt.setInt(1, book_ID);
 			        
 				System.out.println("SQL Statement Prepared");
