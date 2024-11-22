@@ -16,10 +16,9 @@ public class testing_menu {
 		System.out.println("=======================================================");
 		System.out.println("       Testing Application Main Menu (Trish)		   ");
 		System.out.println("-------------------------------------------------------");
-		System.out.println("[2] Customer Management		    		   			   ");
-		System.out.println("[3] Return Processing		    		   			   ");
-		System.out.println("[4] View Author Popularity Report		    		   ");
-		System.out.println("[5] View Book Genre Popularity Report		    	   ");
+		System.out.println("[1] Customer Record Management		    		   			   ");
+		System.out.println("[2] Return of Sold Books		    		   			   ");
+		System.out.println("[3] Author and Book Genre Popularity Report	    	   ");
 		System.out.println("[0] Exit the Menu									   ");
 		System.out.println("=======================================================");
 		
@@ -27,25 +26,42 @@ public class testing_menu {
 		menuselection = Integer.parseInt(console.nextLine());
 		
 		switch(menuselection) {
-			case 2: 
+			case 1: 
 				customer_management_menu cmm = new customer_management_menu();
 				while (cmm.menu()!=0) {}
 				break;
 			
-			case 3:
+			case 2:
 				returnProcess_menu rpm = new returnProcess_menu();
 				while (rpm.menu()!=0) {}
 				break;
 			
-			case 4:
-				author_report ar = new author_report();
-				ar.generate_authorreport();
+			case 3:
+				System.out.println("=======================================================");
+				System.out.println("       Which report would you like to generate?		   ");
+				System.out.println("-------------------------------------------------------");
+				System.out.println("[1] Author Popularity Report ");
+				System.out.println("[2] Book Genre Report");
+				System.out.println("[0] Exit the Menu									   ");
+				System.out.println("=======================================================");
+				
+				System.out.println("Enter Selected Function: ");
+				int choice = Integer.parseInt(console.nextLine());
+				
+					if (choice == 1) {
+						author_report ar = new author_report();
+						ar.generate_authorreport();
+					}
+					else if (choice == 2) {
+						bookgenre_report bgr = new bookgenre_report();
+						bgr.generate_bookgenrereport();
+					}
+					else {
+						System.out.println("Invalid Input.");
+					}
+					
 				break;
 			
-			case 5:
-				bookgenre_report bgr = new bookgenre_report();
-				bgr.generate_bookgenrereport();
-				
 			case 0:
 				break;
 			
