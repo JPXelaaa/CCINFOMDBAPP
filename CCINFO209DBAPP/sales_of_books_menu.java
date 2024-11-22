@@ -1,131 +1,59 @@
-import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-public class sales_of_books_menu {
+public class book_activity_report {
+	
+	public int year;
+	public int month;
 	
 	
-	public sales_of_books_menu() {
+	public book_activity_report() {
 		
 	}
 	
 	
-	public int menu() {
-		int menuSelection = 0;
-        Scanner sc = new Scanner(System.in);
-        
-        
-        while(menuSelection != 4) {
-        	
-        	System.out.println(" ");
-            System.out.println(" ");
-            System.out.println("=======================================================");
-            System.out.println("    Order Records Menu						   ");
-            System.out.println("-------------------------------------------------------");
-            System.out.println("[1] Create Purchase Record						        ");
-            System.out.println("[2] View Purchase Record						    	");
-            System.out.println("[3] Update Status of Order						    	");
-            System.out.println("[4] Exit Orders Management						        ");
+	public void generate_bookact_report() {
+		String reportQuery = ("SELECT		b.title,"
+							+ "				bs.bookstore_name,"
+							+ "				ROUND(SUM(od.quantity_ordered), 2)		AS  totalquantity\r\n"
+							+ "FROM			books b		JOIN publisher_books pb		ON	b.book_ID = pb.book_ID\r\n"
+							+ "							JOIN order_details od		ON	pb.book_ID = od.book_ID\r\n"
+							+ "							JOIN orders o				ON	od.order_number = o.order_number\r\n"
+							+ "							JOIN bookstores bs			ON	o.bookstore_ID = bs.bookstore_ID\r\n"
+							+ "WHERE		YEAR(o.order_date) = ? \r\n"
+							+ "AND			MONTH(o.order_date) = ? \r\n"
+							+ "GROUP BY		b.title, bs.bookstore_name\r\n"
+							+ "ORDER BY		b.title\r\n");
+		
 
+		
+		try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+            System.out.println("Connected to the database successfully");
 
-            System.out.println("Enter Selected Function: ");
-            menuSelection = Integer.parseInt(sc.nextLine());
-        	
-            switch (menuSelection) {
-            	case 1:
-            		sales_of_books sb = new sales_of_books();
-            		
-            		
-            		System.out.println("Enter Purchase Information:");
-                    System.out.println("BookID:");                      sb.bookID               = Integer.parseInt(sc.nextLine());
-                    System.out.println("PublisherID:");                 sb.publisherID          = Integer.parseInt(sc.nextLine());
-                    System.out.println("BookstoreID:");                 sb.bookstoreID          = sc.nextLine();
-                    System.out.println("Quantity:");                 	sb.quantity_ordered     = Integer.parseInt(sc.nextLine());
-                    System.out.println("Remarks:");                 	sb.remarks              = sc.nextLine();
+            PreparedStatement reportStmt = conn.prepareStatement(reportQuery);
+            reportStmt.setInt(1, year);
+            reportStmt.setInt(2, month);
+            System.out.println("SQL Statement Prepared");
 
-                    
-                    if(sb.check_book(sb.bookID) && sb.check_bookstore(sb.bookstoreID) && sb.check_publisher(sb.publisherID)) {
-                    	sb.add_orderRecord();
-                    } else {
-                    	System.out.println("BookID/PublisherID/BookstoreID does not exist. Purchase Order addition aborted.");
-                    }
-                    
-             
-                    
-            		break;
-            		
-            	case 2:
-            		int viewSelection = 0;
-                    Scanner scv = new Scanner(System.in);
-            		sb = new sales_of_books();
+            ResultSet rs = reportStmt.executeQuery();
+            System.out.printf("%-45s %-40s %-15s\n", "Title", "Bookstore Name", "Total Quantity");
+            System.out.println("--------------------------------------------------------------------------------------------------------");
 
-            		
-            		System.out.println(" ");
-                    System.out.println(" ");
-                    System.out.println("=======================================================");
-                    System.out.println("    Please Select Information						   ");
-                    System.out.println("-------------------------------------------------------");
-                    System.out.println("[1] View Book Purchase						        ");
-                    System.out.println("[2] View Publisher Purchase						    ");
-                    
-                    System.out.println("Enter Selected Function: ");
-                    viewSelection = Integer.parseInt(scv.nextLine());
-                    
-                    switch (viewSelection) {
-                    
-                    	case 1:
-                    		System.out.println("Enter Book Information:");
-                            System.out.println("BookID:");                      sb.bookID          = Integer.parseInt(sc.nextLine());
-                            
-                            if(sb.check_book(sb.bookID)) {
-                            	sb.viewOrdersByBook(sb.bookID);
-                            } else {
-                            	System.out.println("BookID does not exist.");
-
-                            }
-                    		
-                    	break;
-                    	
-                    	
-                    	case 2:
-                    		System.out.println("Enter Book Information:");
-                            System.out.println("PublisherID:");                 sb.publisherID     = Integer.parseInt(sc.nextLine());
-                            
-                            if(sb.check_publisher(sb.publisherID)) {
-                            	sb.viewOrdersByPublisher(sb.publisherID);
-                            } else {
-                            	System.out.println("PublisherID does not exist");
-
-                            }
-
-                    	break;
-                    	
-                    	
-                    	default:
-                            System.out.println("Invalid Selection");
-
-                    }
-                    
-                    
-            		break;
-            	case 3:
-            		sb = new sales_of_books();
-
-            		System.out.println("Enter Purchase Information:");
-                    System.out.println("Order Number:");                      	  sb.order_number                 = sc.nextLine();
-                    System.out.println("Status:");                      		  sb.status                       = sc.nextLine();
-
-                    sb.updateOrderStatus(sb.order_number, sb.status);
-                    
-            	case 4:
-            		
-            		break;
-            	default:
-                    System.out.println("Invalid Selection");
+            while (rs.next()) {
+                System.out.printf("%-45s %-45s %-10.2f\n",
+                        rs.getString("title"),
+                        rs.getString("bookstore_name"),
+                        rs.getFloat("totalquantity"));
             }
-        	
+
+            System.out.println("\nEnd of Report");
+            rs.close();
+            reportStmt.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
-     
-		
-        return menuSelection;
-		
-	}
+    }
 }
