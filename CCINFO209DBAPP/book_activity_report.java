@@ -17,7 +17,7 @@ public class book_activity_report {
 	public void generate_bookact_report() {
 		String reportQuery = ("SELECT		b.title,"
 							+ "				bs.bookstore_name,"
-							+ "				ROUND(SUM(od.quantityOrdered), 2)		AS  totalquantity\r\n"
+							+ "				ROUND(SUM(od.quantity_ordered), 2)		AS  totalquantity\r\n"
 							+ "FROM			books b		JOIN publisher_books pb		ON	b.book_ID = pb.book_ID\r\n"
 							+ "							JOIN order_details od		ON	pb.book_ID = od.book_ID\r\n"
 							+ "							JOIN orders o				ON	od.order_number = o.order_number\r\n"
@@ -38,17 +38,17 @@ public class book_activity_report {
             System.out.println("SQL Statement Prepared");
 
             ResultSet rs = reportStmt.executeQuery();
-            System.out.printf("%-30s %-30s %-10s\n", "Title", "Bookstore Name", "Total Quantity");
-            System.out.println("--------------------------------------------------------------");
+            System.out.printf("%-45s %-40s %-15s\n", "Title", "Bookstore Name", "Total Quantity");
+            System.out.println("--------------------------------------------------------------------------------------------------------");
 
             while (rs.next()) {
-                System.out.printf("%-30s %-30s %-10.2f\n",
+                System.out.printf("%-45s %-45s %-10.2f\n",
                         rs.getString("title"),
                         rs.getString("bookstore_name"),
                         rs.getFloat("totalquantity"));
             }
 
-            System.out.println("End of Report");
+            System.out.println("\nEnd of Report");
             rs.close();
             reportStmt.close();
         } catch (Exception e) {
