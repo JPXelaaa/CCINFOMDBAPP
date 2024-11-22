@@ -10,9 +10,6 @@ public class customer_management_menu {
 		int menuselection;
 		Scanner console = new Scanner(System.in);
 		
-		do 
-		{
-			
 			System.out.println("  ");
 			System.out.println("  ");
 			System.out.println("=======================================================");
@@ -31,9 +28,9 @@ public class customer_management_menu {
 			customer_management c = new customer_management();
 			switch (menuselection) 
 			{
-				case 1: // Adding a new Records, ask the user for the values of the record fields
+				case 1: // adding a new Records, ask the user for the values of the record fields
 					
-					System.out.println ("Enter product information");
+					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();
 					System.out.println ("Bookstore Name      : ");  c.bookstore_name  		 = console.nextLine();
 					System.out.println ("Contact First Name  : ");  c.contact_firstName  	 = console.nextLine();
@@ -48,13 +45,13 @@ public class customer_management_menu {
 					
 				case 2:
 					
-					System.out.println ("Enter product information");
+					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();
 		
 					if (c.get_customer()==0) {
-						System.out.println("That product does not exists on the records");
+						break;
 					} else {
-						System.out.println ("Current Product information");
+						System.out.println ("Current Customer information");
 						System.out.println ("-------------------------------------------------------------------");
 						System.out.println ("Bookstore ID        	: " + c.bookstore_ID);
 						System.out.println ("Bookstore Name        	: " + c.bookstore_name);
@@ -65,7 +62,7 @@ public class customer_management_menu {
 						System.out.println ("Address Line 2    		: " + c.addressLine2);
 						System.out.println ("City           		: " + c.city);
 						
-						System.out.println ("Enter updated product information");
+						System.out.println ("Enter updated customer information");
 						System.out.println ("-------------------------------------------------------------------");
 						System.out.println ("Bookstore Name        	: ");  c.bookstore_name  	= console.nextLine();
 						System.out.println ("Contact First Name     : ");  c.contact_firstName 	= console.nextLine();
@@ -92,8 +89,8 @@ public class customer_management_menu {
 					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();		
 
-					c.get_customer();
-					System.out.println ("Current Product information");
+					if (c.get_customer() == 1) {
+					System.out.println ("Current Customer information");
 					System.out.println ("-------------------------------------------------------------------");
 					System.out.println ("Bookstore ID        	: " + c.bookstore_ID);
 					System.out.println ("Bookstore Name        	: " + c.bookstore_name);
@@ -103,6 +100,11 @@ public class customer_management_menu {
 					System.out.println ("Address Line 1      	: " + c.addressLine1);
 					System.out.println ("Address Line 2    		: " + c.addressLine2);
 					System.out.println ("City           		: " + c.city);
+					}
+					
+					else 
+						return 0;
+					
 					break;
 					
 				case 0:
@@ -112,7 +114,6 @@ public class customer_management_menu {
 					System.out.println ("Input invalid. Try again");
 					break;
 			}  
-		} while (menuselection != 0);
 		return menuselection;
 	}
 	
