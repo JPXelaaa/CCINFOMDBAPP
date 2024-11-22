@@ -1,11 +1,43 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Scanner;
 
 public class returnProcess_menu {
-
+	public String 	return_ID;
+	
 	public returnProcess_menu() {
-		
+		return_ID			= "";
 	}
 	
+	public int returnIDChoice() {
+	   	 try {
+	            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	            
+	            PreparedStatement checkStmt = conn.prepareStatement(
+	                "SELECT COUNT(*) AS count FROM returns WHERE return_ID=?"
+	            );
+	            checkStmt.setString(1, return_ID);
+	            ResultSet r = checkStmt.executeQuery();
+	            r.next();
+	            int count = r.getInt("count");
+	            r.close();
+	            checkStmt.close();
+
+	            if (count == 0) {
+	                System.out.println("Return Record does not exist in the database. Update terminated.");
+	                conn.close();
+	                return 0;
+	            } 
+	            
+	            return 1;
+	   	 } catch (Exception e) {
+	   		 System.out.println(e.getMessage());
+	   		 return 0;
+	   	 }
+	   }
+		
 	public int menu() {
 		int menuselection;
 		Scanner console = new Scanner(System.in);
@@ -49,6 +81,7 @@ public class returnProcess_menu {
 					System.out.println ("Book ID 	: ");  rp.book_ID = Integer.parseInt(console.nextLine());
 		
 					if (rp.get_returnRecordByBook()==0) {
+						System.out.println("Return Record does not exist in the database. Update terminated.");
 						break;
 					} else {
 						System.out.println ("Current Return information");
@@ -58,7 +91,6 @@ public class returnProcess_menu {
 						System.out.println ("Return Reason 		: " + rp.return_reason);
 						System.out.println ("Return Status		: " + rp.return_status);
 						System.out.println ("Quantity Returned  	: " + rp.quantity_returned);
-			
 					}
 					break;
 					
@@ -78,17 +110,24 @@ public class returnProcess_menu {
 					System.out.println ("Quantity Returned 	: " + rp.quantity_returned);
 					}
 					
-					else 
+					else {
+						System.out.println("Return Record does not exist in the database. Update terminated.");
 						return 0;
+					}
 					
 					break;
 				
 				case 4:
 					System.out.println ("Enter Return information");
 					System.out.println ("Return ID	: ");  rp.return_ID = console.nextLine();	
-					System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
 					
-					rp.update_returnRecord();
+					if (returnIDChoice() == 1) {
+						System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
+						rp.update_returnRecord(); 
+					} else {
+						return 0;
+					}
+						
 					break;
 					
 				case 5:
@@ -96,6 +135,12 @@ public class returnProcess_menu {
 					System.out.println ("Enter return information");
 					System.out.println ("Return ID        : ");  rp.return_ID  = console.nextLine();		
 					
+					if (returnIDChoice() == 1) {
+						System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
+						rp.update_returnRecord(); 
+					} else {
+						return 0;
+					}
 					rp.delete_returnRecord();
 					break;
 					
