@@ -113,7 +113,7 @@ public class sales_of_books {
 			
 			this.order_number = generateOrderNumber();
 		    generateDates();
-		    this.status = "processing"; 
+		    this.status = "Processing"; 
 		    
 		    String checkStatusQuery = "SELECT COUNT(*) FROM REF_status WHERE status = ?";
 		    String checkStockQuantityQuery = "SELECT stock_quantity FROM publisher_books WHERE book_ID = ? AND publisher_ID = ?";
@@ -253,12 +253,12 @@ public class sales_of_books {
 	        stmt.setInt(1, bookID);
 	        ResultSet rs = stmt.executeQuery();
 
-	        System.out.printf("%-15s %-20s %-15s %-20s %-35s\n", 
+	        System.out.printf("%-15s %-20s %-20s %-25s %-35s\n", 
 	                          "Order Number", "Order Date", "Status", "Quantity Ordered", "Bookstore Name");
-	        System.out.println("-----------------------------------------------------------------------------------------");
+	        System.out.println("----------------------------------------------------------------------------------------------------");
 
 	        while (rs.next()) {
-	            System.out.printf("%-15s %-20s %-15s %-15d %-30s\n",
+	            System.out.printf("%-15s %-20s %-20s %-25d %-30s\n",
 	                              rs.getString("order_number"),
 	                              rs.getString("order_date"),
 	                              rs.getString("status"),
@@ -287,12 +287,12 @@ public class sales_of_books {
             stmt.setInt(1, publisherID);
             ResultSet rs = stmt.executeQuery();
 
-            System.out.printf("%-15s %-20s %-15s %-15s %-20s %-35s\n", 
+            System.out.printf("%-15s %-20s %-15s %-20s %-25s %-35s\n", 
                               "Order Number", "Order Date", "Status", "Book ID", "Quantity Ordered", "Bookstore Name");
-            System.out.println("----------------------------------------------------------------------------------------------------");
+            System.out.println("----------------------------------------------------------------------------------------------------------------");
 
             while (rs.next()) {
-                System.out.printf("%-15s %-20s %-15s %-15d %-15d %-30s\n",
+                System.out.printf("%-15s %-20s %-15s %-20d %-25d %-35s\n",
                                   rs.getString("order_number"),
                                   rs.getString("order_date"),
                                   rs.getString("status"),
@@ -357,7 +357,123 @@ public class sales_of_books {
 	        e.printStackTrace();
 	    }
 	}
+	
+	
+	
+	public void displayExistingBookIDs() {
+	    String query 				  = "SELECT book_ID, title FROM books";
 
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        ResultSet rs = stmt.executeQuery();
+
+	        System.out.printf("%-10s %-50s\n", "Book ID", "Title");
+	        System.out.println("------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            System.out.printf("%-10d %-50s\n", rs.getInt("book_ID"), rs.getString("title"));
+	        }
+
+	        stmt.close();
+	        conn.close();
+	    } catch (Exception e) {
+	        System.out.println("Error retrieving Book IDs and Titles: " + e.getMessage());
+	    }
+	}
+	
+	
+	public void displayExistingPublisherIDs() {
+	    String query 				= "SELECT publisher_ID, publisher_name FROM publishers";
+
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+	        PreparedStatement stmt = conn.prepareStatement(query);
+	        ResultSet rs = stmt.executeQuery();
+
+	        System.out.printf("%-15s %-30s\n", "Publisher ID", "Publisher Name");
+	        System.out.println("------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            System.out.printf("%-15d %-30s\n", rs.getInt("publisher_ID"), rs.getString("publisher_name"));
+	        }
+
+	        stmt.close();
+	        conn.close();
+	    } catch (Exception e) {
+	        System.out.println("Error retrieving Publisher IDs and Names: " + e.getMessage());
+	    }
+	}
+	
+	public void displayExistingOrderNumbers() {
+	    String query 			   = "SELECT o.order_number, bs.bookstore_name, o.status " 
+	    							+ "FROM orders o " 
+	    							+ "JOIN bookstores bs ON o.bookstore_ID = bs.bookstore_ID " 
+	    							+ "ORDER BY o.order_number";
+
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	         PreparedStatement stmt = conn.prepareStatement(query);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        System.out.printf("%-15s %-30s %-20s\n", "Order Number", "Bookstore Name", "Order Status");
+	        System.out.println("------------------------------------------------------------------");
+
+	        while (rs.next()) {
+	            System.out.printf("%-15s %-30s %-20s\n",
+	                    rs.getString("order_number"),
+	                    rs.getString("bookstore_name"),
+	                    rs.getString("status"));
+	        }
+
+	    } catch (Exception e) {
+	        System.out.println("Error retrieving Order Numbers: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+	
+	public void displayExistingBookstoreIDs() {
+	    String query 			  = "SELECT bookstore_ID, bookstore_name FROM bookstores";
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	         PreparedStatement stmt = conn.prepareStatement(query);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        System.out.printf("%-15s %-30s\n", "Bookstore ID", "Bookstore Name");
+	        System.out.println("-------------------------------------------------");
+	        while (rs.next()) {
+	            System.out.printf("%-15s %-30s\n",
+	                    rs.getString("bookstore_ID"),
+	                    rs.getString("bookstore_name"));
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving bookstore IDs: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+	
+	public void displayBooksPublishersAndStock() {
+	    String query 			= "SELECT b.book_ID, b.title, p.publisher_ID, p.publisher_name, pb.stock_quantity " 
+	    						+ "FROM books b " 
+	    						+ "JOIN publisher_books pb ON b.book_ID = pb.book_ID " 
+	    						+ "JOIN publishers p ON pb.publisher_ID = p.publisher_ID " 
+	    						+ "ORDER BY b.book_ID, p.publisher_ID";
+
+	    try (Connection conn = DriverManager.getConnection( "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	         PreparedStatement stmt = conn.prepareStatement(query);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        System.out.printf("%-10s %-45s %-25s %-45s %-15s\n", "Book ID", "Book Title", "Publisher ID", "Publisher Name", "Stock Quantity");
+	        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+	        while (rs.next()) {
+	            System.out.printf("%-10d %-45s %-25d %-45s %-15d\n",
+	                    rs.getInt("book_ID"),
+	                    rs.getString("title"),
+	                    rs.getInt("publisher_ID"),
+	                    rs.getString("publisher_name"),
+	                    rs.getInt("stock_quantity"));
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving books, publishers, and stock quantities: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
 		
 		
 }
