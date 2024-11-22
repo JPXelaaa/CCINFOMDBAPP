@@ -21,7 +21,6 @@ public class sales_of_books {
 		
 	}
 	
-	//checking if exist
 	
 	public boolean check_book(int bookID) {
         String query 			   = "SELECT COUNT(*) FROM books WHERE book_ID = ?";
@@ -114,7 +113,9 @@ public class sales_of_books {
 			
 			this.order_number = generateOrderNumber();
 		    generateDates();
+		    this.status = "processing"; 
 		    
+		    String checkStatusQuery = "SELECT COUNT(*) FROM REF_status WHERE status = ?";
 		    String checkStockQuantityQuery = "SELECT stock_quantity FROM publisher_books WHERE book_ID = ? AND publisher_ID = ?";
 		    String insertOrderQuery 	   = "INSERT INTO orders (order_number, bookstore_ID, order_date, required_date, shipped_date, status, remarks) VALUES (?,?,?,?,?,?,?)";
 		    String insertOrderDetailsQuery = "INSERT INTO order_details (order_number, book_ID, publisher_ID, quantity_ordered) VALUES (?,?,?,?)";
@@ -122,6 +123,14 @@ public class sales_of_books {
 		    
 		    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
 		        System.out.println("Connected to DB Successfully");
+		        
+		        PreparedStatement checkStatusStmt = conn.prepareStatement(checkStatusQuery);
+		        checkStatusStmt.setString(1, this.status);
+		        ResultSet statusRs = checkStatusStmt.executeQuery();
+		        if (statusRs.next() && statusRs.getInt(1) == 0) {
+		            System.out.println("Error: Status 'processing' does not exist in REF_status table. Aborting order creation.");
+		            return;
+		        }
 		        
 		        PreparedStatement checkStockStmt = conn.prepareStatement(checkStockQuantityQuery);
 		        checkStockStmt.setInt(1, bookID);
