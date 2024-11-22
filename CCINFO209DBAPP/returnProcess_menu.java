@@ -55,6 +55,7 @@ public class returnProcess_menu {
 						System.out.println ("Return ID        	: " + rp.return_ID);
 						System.out.println ("Return Date     	: " + rp.return_date);
 						System.out.println ("Return Reason 		: " + rp.return_reason);
+						System.out.println ("Return Status		: " + rp.return_status);
 						System.out.println ("Quantity Returned  : " + rp.quantity_returned);
 			
 					}
@@ -72,6 +73,7 @@ public class returnProcess_menu {
 					System.out.println ("Return Date        	: " + rp.return_date);
 					System.out.println ("Book ID		     	: " + rp.book_ID);
 					System.out.println ("Return Reason      	: " + rp.return_reason);
+					System.out.println ("Return Status			: " + rp.return_status);
 					System.out.println ("Quantity Returned 		: " + rp.quantity_returned);
 					}
 					
