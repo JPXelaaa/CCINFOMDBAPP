@@ -8,7 +8,8 @@ public class author_and_publisher_management_view {
     public int menu() {
         int menuselection = 0;
         Scanner console = new Scanner(System.in);
-
+        String choice;
+        int pass, dec;
         // Display the menu
         System.out.println("=======================================================");
         System.out.println("    Author and Publisher Management Menu               ");
@@ -53,7 +54,11 @@ public class author_and_publisher_management_view {
                 // Update Author
                 System.out.print("Enter Pen Name of Author to Update: ");
                 apm.penName = console.nextLine();
-
+                pass = apm.AuthorVerify();
+                if (pass == 0)
+                {
+                	break;
+                }
                 System.out.println("Enter Updated Author Information:");
                 System.out.print("First Name: ");
                 apm.firstName = console.nextLine();
@@ -73,6 +78,11 @@ public class author_and_publisher_management_view {
                 // Delete Author
                 System.out.print("Enter Pen Name of Author to Delete: ");
                 apm.penName = console.nextLine();
+                pass = apm.AuthorVerify();
+                if (pass == 0)
+                {
+                	break;
+                }
                 apm.deleteAuthor();
                 break;
 
@@ -80,6 +90,11 @@ public class author_and_publisher_management_view {
                 // View Author
                 System.out.print("Enter Pen Name of Author: ");
                 apm.penName = console.nextLine();
+                pass = apm.AuthorVerify();
+                if (pass == 0)
+                {
+                	break;
+                }
                 apm.getAuthor();
 
                 System.out.println ("Current Author information");
@@ -96,12 +111,19 @@ public class author_and_publisher_management_view {
                 // View Books by Author
                 System.out.print("Enter Pen Name of Author: ");
                 apm.penName = console.nextLine();
+                pass = apm.AuthorVerify();
+                if (pass == 0)
+                {
+                	break;
+                }
                 apm.getBooksByAuthor();
                 break;
 
             case 6:
                 // Add Publisher
                 System.out.println("Enter Publisher Information:");
+                System.out.print("Publisher ID: ");
+                apm.publisherID = Integer.parseInt(console.nextLine());
                 System.out.print("Publisher Name: ");
                 apm.publisherName = console.nextLine();
                 System.out.print("Publisher Address Line 1: ");
@@ -118,13 +140,32 @@ public class author_and_publisher_management_view {
                 break;
 
             case 7:
-                // Update Publisher
-                System.out.print("Enter Publisher Name to Update: ");
-                apm.publisherName = console.nextLine();
-                if (apm.getBooksByPublisher() == 0) {
-                    System.out.println("No publisher found with that name.");
+            	System.out.println("Would you like to search by Publisher ID or Name?");
+                System.out.println("[1] Publisher ID");
+                System.out.println("[2] Publisher Name");
+                System.out.print("Enter your choice (1 or 2): ");
+                choice = console.nextLine();
+                pass = 0;
+                dec = 0;
+                if (choice.equals("1")) {
+                    System.out.print("Enter Publisher ID: ");
+                    apm.publisherID = Integer.parseInt(console.nextLine());
+                    apm.getPublisherByID();
+                    pass = apm.publisherIDChoice();
                 } else {
+                    System.out.print("Enter Publisher Name: ");
+                    apm.publisherHolder = console.nextLine();
+                    apm.getPublisher();
+                    pass = apm.publisherNameChoice();
+                }
+                
+                if (pass == 0)
+                {
+                	break;
+                }
                     System.out.println("Enter Updated Publisher Information:");
+                    System.out.print("Publisher Name: ");
+                    apm.publisherName = console.nextLine();
                     System.out.print("Publisher Address Line 1: ");
                     apm.publisherAddressLine1 = console.nextLine();
                     System.out.print("Publisher Address Line 2: ");
@@ -135,40 +176,111 @@ public class author_and_publisher_management_view {
                     apm.publisherContactEmail = console.nextLine();
                     System.out.print("Phone Number: ");
                     apm.publisherPhoneNumber = console.nextLine();
-                    apm.update_publisher();
-                }
+                    if (dec == 0) {
+                    	apm.update_publisher();
+                    }
+                    if (dec == 1) {
+                    	apm.update_publisherID();
+                    }
+                    
                 break;
 
             case 8:
                 // Delete Publisher
-                System.out.print("Enter Publisher Name to Delete: ");
-                apm.publisherName = console.nextLine();
-                apm.deletePublisher();
-                break;
-
+            	System.out.println("Would you like to search by Publisher ID or Name?");
+                System.out.println("[1] Publisher ID");
+                System.out.println("[2] Publisher Name");
+                System.out.print("Enter your choice (1 or 2): ");
+                choice = console.nextLine();
+                pass = 0;
+                if (choice.equals("1")) {
+                    System.out.print("Enter Publisher ID: ");
+                    apm.publisherID = Integer.parseInt(console.nextLine());
+                    pass = apm.publisherIDChoice();
+                    if (pass == 0)
+                    {
+                    	break;
+                    }
+                    apm.deletePublisherID();
+                    break;
+                } else {
+                    System.out.print("Enter Publisher Name: ");
+                    apm.publisherName = console.nextLine();
+                    apm.getPublisher();
+                    pass = apm.publisherNameChoice();
+                    if (pass == 0)
+                    {
+                    	break;
+                    }
+                    apm.deletePublisher();
+                    break;
+                }         
             case 9:
                 // View Publisher
-                System.out.print("Enter Publisher Name: ");
-                apm.publisherName = console.nextLine();
-                apm.getPublisher();
+            	System.out.println("Would you like to search by Publisher ID or Name?");
+                System.out.println("[1] Publisher ID");
+                System.out.println("[2] Publisher Name");
+                System.out.print("Enter your choice (1 or 2): ");
+                choice = console.nextLine();
+                pass = 0;
+                if (choice.equals("1")) {
+                    System.out.print("Enter Publisher ID: ");
+                    apm.publisherID = Integer.parseInt(console.nextLine());
+                    apm.getPublisherByID();
+                    pass = apm.publisherIDChoice();
+                } else {
+                    System.out.print("Enter Publisher Name: ");
+                    apm.publisherName = console.nextLine();
+                    apm.getPublisher();
+                    pass = apm.publisherNameChoice();
+                }
                 
-                System.out.println ("Current Publisher information");
-    			System.out.println ("-------------------------------------------------------------------");
-    			System.out.println ("Publisher Name        			 : " + apm.publisherName);
-    			System.out.println ("Publisher Address Line 1        	 : " + apm.publisherAddressLine1);
-    			System.out.println ("Publisher Address Line 2    	 	 : " + apm.publisherAddressLine2);
-    			System.out.println ("Publisher City       			 : " + apm.publisherCity);
-    			System.out.println ("Publisher Contact Email    	 	 : " + apm.publisherContactEmail);
-    			System.out.println ("Publisher Phone Number    		 : " + apm.publisherPhoneNumber);
+                if (pass == 0)
+                {
+                	break;
+                }
+
+                System.out.println("Current Publisher information");
+                System.out.println("-------------------------------------------------------------------");
+                System.out.println("Publisher ID					 : " + apm.publisherID);
+                System.out.println("Publisher Name        			 : " + apm.publisherName);
+                System.out.println("Publisher Address Line 1        	 : " + apm.publisherAddressLine1);
+                System.out.println("Publisher Address Line 2    	 	 : " + apm.publisherAddressLine2);
+                System.out.println("Publisher City       			 : " + apm.publisherCity);
+                System.out.println("Publisher Contact Email    	 	 : " + apm.publisherContactEmail);
+                System.out.println("Publisher Phone Number    		 : " + apm.publisherPhoneNumber);
                 break;
 
             case 10:
                 // View Books by Publisher
-                System.out.print("Enter Publisher Name: ");
-                apm.publisherName = console.nextLine();
-                apm.getBooksByPublisher();
+            	System.out.println("Would you like to search by Publisher ID or Name?");
+                System.out.println("[1] Publisher ID");
+                System.out.println("[2] Publisher Name");
+                System.out.print("Enter your choice (1 or 2): ");
+                choice = console.nextLine();
+                pass = 0;
+                if (choice.equals("1")) {
+                    System.out.print("Enter Publisher ID: ");
+                    apm.publisherID = Integer.parseInt(console.nextLine());
+                    apm.getPublisherByID();
+                    pass = apm.publisherIDChoice();
+                    if (pass == 0)
+                    {
+                    	break;
+                    }
+                    apm.getBooksByPublisher();
+                } else {
+                    System.out.print("Enter Publisher Name: ");
+                    apm.publisherName = console.nextLine();
+                    apm.getPublisher();
+                    pass = apm.publisherNameChoice();
+                    if (pass == 0)
+                    {
+                    	break;
+                    }
+                    apm.getBooksByPublisherID();
+                }
                 break;
-
             case 0:
                 System.out.println("Exiting Management Menu...");
                 break;
