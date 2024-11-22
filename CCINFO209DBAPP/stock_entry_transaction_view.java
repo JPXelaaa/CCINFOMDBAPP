@@ -14,6 +14,7 @@ public class stock_entry_transaction_view {
         Scanner console = new Scanner(System.in);
         stock_entry_transaction set = new stock_entry_transaction();
        
+
         System.out.println("==============================================");
         System.out.println("      Stock Entry Transaction Menu            ");
         System.out.println("----------------------------------------------");
@@ -21,6 +22,8 @@ public class stock_entry_transaction_view {
         System.out.println("[2] Update Current Stock Quantity");
         System.out.println("[3] View Stock Information");
         System.out.println("[4] Delete Stock Entries");
+        System.out.println("[5] View Stock by Publisher");
+        System.out.println("[6] View Stock by Book");
         System.out.println("[0] Exit");
         System.out.println("==============================================");
         System.out.print("Enter your choice: ");
@@ -115,7 +118,30 @@ public class stock_entry_transaction_view {
             set.bookID = Integer.parseInt(console.nextLine());
             set.deleteStockEntry();
             break;
+        case 5:
+            // View Stock by Publisher
+        	showPublishers = "";
+            System.out.print("Do you want to see the existing publisher IDs? (yes/no): ");
+            showPublishers = console.nextLine().trim().toLowerCase();
+            if (showPublishers.equals("yes")) {
+                set.displayPublishers();
+            }
+            System.out.print("Enter Publisher ID: ");
+            set.publisherID = Integer.parseInt(console.nextLine());
+            set.viewStockByPublisher();
+            break;
 
+        case 6:
+            // View Stock by Book
+            System.out.print("Do you want to see the existing book IDs (yes/no): ");
+            showBooks = console.nextLine().trim().toLowerCase();
+            if (showBooks.equals("yes")) {
+                set.displayBooks();
+            }
+            System.out.print("Enter Book ID: ");
+            set.bookID = Integer.parseInt(console.nextLine());
+            set.viewStockByBook();
+            break;    	
         case 0:
             System.out.println("Exiting Stock Entry Management...");
             break;

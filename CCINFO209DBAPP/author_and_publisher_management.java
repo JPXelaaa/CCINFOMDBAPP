@@ -204,23 +204,6 @@ public class author_and_publisher_management {
             );
             System.out.println("Connection to DB Successful");
 
-            // Check if the publisher exists
-            PreparedStatement checkStmt = conn.prepareStatement(
-                "SELECT COUNT(*) AS count FROM publishers WHERE publisher_ID=?"
-            );
-            checkStmt.setInt(1, publisherID);
-            ResultSet rs = checkStmt.executeQuery();
-            rs.next();
-            int count = rs.getInt("count");
-            rs.close();
-            checkStmt.close();
-
-            if (count == 0) {
-                System.out.println("Publisher does not exist in the database. Update terminated.");
-                conn.close();
-                return 0;
-            }
-
             PreparedStatement pstmt = conn.prepareStatement(
                 "UPDATE publishers SET publisher_name=?, addressLine1=?, addressLine2=?, contact_email=?, phone_number=? WHERE publisher_ID=?"
             );
@@ -229,10 +212,10 @@ public class author_and_publisher_management {
             pstmt.setString(3, publisherAddressLine2);
             pstmt.setString(4, publisherContactEmail);
             pstmt.setString(5, publisherPhoneNumber);
-            pstmt.setString(6, publisherName); // Use publisherName to identify the publisher
+            pstmt.setInt(6, publisherID); // Use publisherName to identify the publisher
             System.out.println("SQL Statement Prepared");
 
-            int rowsAffected = pstmt.executeUpdate();
+            int rowsAffected = pstmt.executeUpdate();	
             System.out.println("Publisher record updated, rows affected: " + rowsAffected);
 
             pstmt.close();
@@ -284,44 +267,6 @@ public class author_and_publisher_management {
 				System.out.println("Record was Retrieved");
 			}
             
-            pstmt.close();
-            conn.close();
-            return recordCount;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return 0;
-        }
-    }
-    
-    public int getBooksByAuthor() {
-        int recordCount = 0;
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-            System.out.println("Connection to DB Successful");
-
-            PreparedStatement pstmt = conn.prepareStatement(
-                "SELECT b.ISBN, b.title, b.publication_year, b.stock_quantity," +
-                "GROUP_CONCAT(bg.genre SEPARATOR ', ') AS genres " +
-                "FROM book b " +
-                "JOIN book_authors ba ON b.ISBN = ba.ISBN " +
-                "JOIN book_genres bg ON b.ISBN = bg.ISBN " +
-                "JOIN genres g ON bg.genre = g.genre " +
-                "WHERE ba.pen_name = ?" +
-                "GROUP BY b.ISBN "
-            );
-            pstmt.setString(1, penName);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                recordCount++;
-                ISBN = rs.getString("ISBN");
-                bookTitle = rs.getString("title");
-                publicationDate = rs.getString("publication_year");
-                stockQuantity = rs.getInt("stock_quantity");
-                bookGenre = rs.getString("genres");
-                System.out.println("Book Retrieved: " + bookTitle + " (Genre: " + bookGenre + ")");
-            }
-
             pstmt.close();
             conn.close();
             return recordCount;
@@ -396,80 +341,6 @@ public class author_and_publisher_management {
         }
     }
     
-    public int getBooksByPublisher() {
-        int recordCount = 0;
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-            System.out.println("Connection to DB Successful");
-
-            PreparedStatement pstmt = conn.prepareStatement(
-                "SELECT b.ISBN, b.title, b.publication_year, b.stock_quantity, " +
-                "GROUP_CONCAT(g.genre SEPARATOR ', ') AS genres " +
-                "FROM books b " +
-                "JOIN book_genres bg ON b.ISBN = bg.ISBN " +
-                "JOIN genres g ON bg.genre = g.genre " +
-                "WHERE b.publisher_name = ?" +
-                "GROUP BY b.ISBN"
-            );
-            pstmt.setString(1, publisherName);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                recordCount++;
-                ISBN = rs.getString("ISBN");
-                bookTitle = rs.getString("title");
-                publicationDate = rs.getString("publication_year");
-                stockQuantity = rs.getInt("stock_quantity");
-                bookGenre = rs.getString("genres");
-                System.out.println("Book Retrieved: " + bookTitle + " (Genre: " + bookGenre + ")");
-            }
-
-            pstmt.close();
-            conn.close();
-            return recordCount;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return 0;
-        }
-    }
-    
-    public int getBooksByPublisherID() {
-        int recordCount = 0;
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-            System.out.println("Connection to DB Successful");
-
-            PreparedStatement pstmt = conn.prepareStatement(
-                "SELECT b.ISBN, b.title, b.publication_year, b.stock_quantity, " +
-                "GROUP_CONCAT(g.genre SEPARATOR ', ') AS genres " +
-                "FROM books b " +
-                "JOIN book_genres bg ON b.ISBN = bg.ISBN " +
-                "JOIN genres g ON bg.genre = g.genre " +
-                "WHERE b.publisher_ID = ?" +
-                "GROUP BY b.ISBN"
-            );
-            pstmt.setString(1, publisherName);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                recordCount++;
-                ISBN = rs.getString("ISBN");
-                bookTitle = rs.getString("title");
-                publicationDate = rs.getString("publication_year");
-                stockQuantity = rs.getInt("stock_quantity");
-                bookGenre = rs.getString("genres");
-                System.out.println("Book Retrieved: " + bookTitle + " (Genre: " + bookGenre + ")");
-            }
-
-            pstmt.close();
-            conn.close();
-            return recordCount;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return 0;
-        }
-    }
-
     public int deleteAuthor() {
         try {
         	Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
@@ -489,32 +360,12 @@ public class author_and_publisher_management {
             return 0;
         }
     }
-
-    public int deletePublisher() {
-        try {
-        	Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-            System.out.println("Connection to DB Successful");
-
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM publishers WHERE publisher_name = ?");
-            pstmt.setString(1, publisherName);
-            pstmt.executeUpdate();
-            System.out.println("Publisher record deleted");
-
-            pstmt.close();
-            conn.close();
-            return 1;
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return 0;
-        }
-    }
     public int deletePublisherID() {
         try {
         	Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
             System.out.println("Connection to DB Successful");
 
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM publishers WHERE publisher_name = ?");
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM publishers WHERE publisher_ID = ?");
             pstmt.setString(1, publisherName);
             pstmt.executeUpdate();
             System.out.println("Publisher record deleted");
@@ -528,35 +379,6 @@ public class author_and_publisher_management {
             return 0;
         }
     }
-	    public int publisherNameChoice() {
-	    	 try {
-	             Connection conn = DriverManager.getConnection(
-	                 "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!"
-	             );
-	             System.out.println("Connection to DB Successful");
-	
-	             // Check if the publisher exists
-	             PreparedStatement checkStmt = conn.prepareStatement(
-	                 "SELECT COUNT(*) AS count FROM publishers WHERE publisher_name=?"
-	             );
-	             checkStmt.setString(1, publisherName);
-	             ResultSet r = checkStmt.executeQuery();
-	             r.next();
-	             int count = r.getInt("count");
-	             r.close();
-	             checkStmt.close();
-	
-	             if (count == 0) {
-	                 System.out.println("Publisher does not exist in the database. Update terminated.");
-	                 conn.close();
-	                 return 0;
-	             } 
-	             return 1;
-	    } catch (Exception e) {
-	        System.out.println(e.getMessage());
-	        return 0;
-	    }
-	}
 	    public int publisherIDChoice() {
 	    	 try {
 	             Connection conn = DriverManager.getConnection(
@@ -615,5 +437,57 @@ public class author_and_publisher_management {
 		        return 0;
 		    }
 	    }
-	    
+	    public void displayPublishers() {
+	        try {
+	            Connection conn = DriverManager.getConnection(
+	                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!"
+	            );
+	            System.out.println("Connection to DB Successful");
+
+	            PreparedStatement pstmt = conn.prepareStatement(
+	                "SELECT publisher_ID, publisher_name FROM publishers"
+	            );
+	            ResultSet rs = pstmt.executeQuery();
+
+	            System.out.println("========================================");
+	            System.out.println("Existing Publishers:");
+	            while (rs.next()) {
+	                System.out.println("Publisher ID: " + rs.getInt("publisher_ID") +
+	                                   ", Publisher Name: " + rs.getString("publisher_name"));
+	            }
+	            System.out.println("========================================");
+
+	            rs.close();
+	            pstmt.close();
+	            conn.close();
+	        } catch (Exception e) {
+	            System.out.println("Error: " + e.getMessage());
+	        }
+	    }
+	    public void displayAuthors() {
+	        try {
+	            Connection conn = DriverManager.getConnection(
+	                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!"
+	            );
+	            System.out.println("Connection to DB Successful");
+
+	            PreparedStatement pstmt = conn.prepareStatement(
+	                "SELECT pen_name FROM authors"
+	            );
+	            ResultSet rs = pstmt.executeQuery();
+
+	            System.out.println("========================================");
+	            System.out.println("Existing Authors:");
+	            while (rs.next()) {
+	                System.out.println("Pen Name: " + rs.getString("pen_name"));
+	            }
+	            System.out.println("========================================");
+
+	            rs.close();
+	            pstmt.close();
+	            conn.close();
+	        } catch (Exception e) {
+	            System.out.println("Error: " + e.getMessage());
+	        }
+	    }
 }

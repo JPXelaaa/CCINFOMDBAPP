@@ -293,4 +293,74 @@ public class stock_entry_transaction {
             System.out.println("Error: " + e.getMessage());
         }
     }
+    public void viewStockByPublisher() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!"
+            );
+            System.out.println("Connection to DB Successful");
+
+            PreparedStatement pstmt = conn.prepareStatement(
+                "SELECT b.book_ID, b.title, p.publisher_ID, p.publisher_name, pb.stock_quantity " +
+                "FROM books b " +
+                "JOIN publisher_books pb ON b.book_ID = pb.book_ID " +
+                "JOIN publishers p ON pb.publisher_ID = p.publisher_ID " +
+                "WHERE p.publisher_ID = ?"
+            );
+            pstmt.setInt(1, publisherID);
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("========================================");
+            System.out.println("Stock Information for Publisher ID: " + publisherID);
+            while (rs.next()) {
+                System.out.println("Book ID: " + rs.getInt("book_ID") +
+                                   ", Title: " + rs.getString("title") +
+                                   ", Publisher Name: " + rs.getString("publisher_name") +
+                                   ", Stock Quantity: " + rs.getInt("stock_quantity"));
+            }
+            System.out.println("========================================");
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void viewStockByBook() {
+        try {
+            Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!"
+            );
+            System.out.println("Connection to DB Successful");
+
+            PreparedStatement pstmt = conn.prepareStatement(
+                "SELECT p.publisher_ID, p.publisher_name, b.book_ID, b.title, pb.stock_quantity " +
+                "FROM publishers p " +
+                "JOIN publisher_books pb ON p.publisher_ID = pb.publisher_ID " +
+                "JOIN books b ON pb.book_ID = b.book_ID " +
+                "WHERE b.book_ID = ?"
+            );
+            pstmt.setInt(1, bookID);
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("========================================");
+            System.out.println("Stock Information for Book ID: " + bookID);
+            while (rs.next()) {
+                System.out.println("Publisher ID: " + rs.getInt("publisher_ID") +
+                                   ", Publisher Name: " + rs.getString("publisher_name") +
+                                   ", Book Title: " + rs.getString("title") +
+                                   ", Stock Quantity: " + rs.getInt("stock_quantity"));
+            }
+            System.out.println("========================================");
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
 }
