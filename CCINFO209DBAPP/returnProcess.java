@@ -22,34 +22,6 @@ public class returnProcess {
 		quantity_returned	= 0;
 	}
 	
-	/*
-	public int returnIDChoice() {
-	   	 try {
-	            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-	            
-	            PreparedStatement checkStmt = conn.prepareStatement(
-	                "SELECT COUNT(*) AS count FROM returns WHERE return_ID=?"
-	            );
-	            checkStmt.setString(1, return_ID);
-	            ResultSet r = checkStmt.executeQuery();
-	            r.next();
-	            int count = r.getInt("count");
-	            r.close();
-	            checkStmt.close();
-
-	            if (count == 0) {
-	                System.out.println("Return Record does not exist in the database. Update terminated.");
-	                conn.close();
-	                return 0;
-	            } 
-	            
-	            return 1;
-	   	 } catch (Exception e) {
-	   		 System.out.println(e.getMessage());
-	   		 return 0;
-	   	 }
-	   }
-		*/
 		public int add_returnRecord() {
 			this.return_status = "P"; // default status of returned books
 
@@ -185,8 +157,9 @@ public class returnProcess {
 					return_status	   = rs.getString("return_status");
 					quantity_returned  = rs.getInt("quantity_returned");
 					
-					System.out.println("Return Record was Retrieved");
 				}
+				
+				System.out.println("Return Record was Retrieved");
 				pstmt.close();
 				conn.close();
 				return recordcount;
@@ -224,8 +197,10 @@ public class returnProcess {
 					return_status	   = rs.getString("return_status");
 					quantity_returned  = rs.getInt("quantity_returned");
 					
-					System.out.println("Return Record was Retrieved");
 				}
+				
+				System.out.println("Return Record was Retrieved");
+				
 				pstmt.close();
 				conn.close();
 				return recordcount;
