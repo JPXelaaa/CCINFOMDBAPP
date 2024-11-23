@@ -22,7 +22,6 @@ public class returnProcess {
 		quantity_returned	= 0;
 	}
 	
-	/*
 	public int returnIDChoice() {
 	   	 try {
 	            Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
@@ -49,63 +48,69 @@ public class returnProcess {
 	   		 return 0;
 	   	 }
 	   }
-		*/
-		public int add_returnRecord() {
-			this.return_status = "P"; // default status of returned books
 
-		    try {
-		        Connection conn = DriverManager.getConnection(
-		                "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-		        System.out.println("Connection to DB Successful");
+	public int add_returnRecord(boolean isFirstReturn) {
+	    this.return_status = "P"; 
 
-		        PreparedStatement pstmt = conn.prepareStatement(
-		                "INSERT INTO returns (return_ID, return_date, return_reason, bookstore_ID, return_status) VALUES (?, CURDATE(), ?, ?, ?)");
-		        pstmt.setString(1, return_ID); 
-		        pstmt.setString(2, return_reason);
-		        pstmt.setString(3, bookstore_ID);
-		        pstmt.setString(4, this.return_status); 
-		        pstmt.executeUpdate();
-		        
-		        System.out.println("Return record added to table");
-		        
-		        pstmt.close();
-		        PreparedStatement validateStmt = conn.prepareStatement(
-		                "SELECT quantity_ordered FROM order_details WHERE book_ID = ? AND publisher_ID = ?");
-		        validateStmt.setInt(1, book_ID);
-		        validateStmt.setInt(2, publisher_ID);
-		        ResultSet rs = validateStmt.executeQuery();
+	    try (Connection conn = DriverManager.getConnection(
+	            "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
 
-		        int quantityOrdered = 0;
-		        if (rs.next()) {
-		            quantityOrdered = rs.getInt("quantity_ordered");
-		        }
-		        rs.close();
-		        validateStmt.close();
+	        System.out.println("Connection to DB Successful");
+	        
+	        int quantityOrdered = 0;
+	        PreparedStatement validateStmt = conn.prepareStatement(
+	                "SELECT quantity_ordered FROM order_details WHERE book_ID = ? AND publisher_ID = ?");
+	        validateStmt.setInt(1, book_ID); 
+	        validateStmt.setInt(2, publisher_ID); 
+	        ResultSet rs = validateStmt.executeQuery();
 
-		        if (quantity_returned > quantityOrdered) {
-		            System.out.println("Error: Quantity returned exceeds the quantity ordered.");
-		            conn.close();
-		            return 0; 
-		        }
+	        if (rs.next()) {
+	            quantityOrdered = rs.getInt("quantity_ordered"); 
+	        } else {
+	            System.out.println("Error: No order found for the specified book and publisher.");
+	            rs.close();
+	            validateStmt.close();
+	            conn.close();
+	            return 0; 
+	        }
 
-		        PreparedStatement dStmt = conn.prepareStatement(
-		                "INSERT INTO return_details (return_ID, book_ID, publisher_ID, quantity_returned) VALUES (?, ?, ?, ?)");
-		        dStmt.setString(1, return_ID); 
-		        dStmt.setInt(2, book_ID);
-		        dStmt.setInt(3, publisher_ID);
-		        dStmt.setInt(4, quantity_returned); 
-		        dStmt.executeUpdate();
+	        rs.close();
+	        validateStmt.close();
+	        
+	        if (quantity_returned > quantityOrdered) {
+	            System.out.println("Error: Quantity returned exceeds the quantity ordered.");
+	            conn.close();
+	            return -1;
+	        }
 
-		        
-		        System.out.println("Return Record and Details were created, and stock updated");
-		        dStmt.close();
-		        conn.close();
-		        return 1;
-		    } catch (Exception e) {
-		        System.out.println(e.getMessage());
-		        return 0;
-		    }
-		}
+	        if (isFirstReturn) {
+	            PreparedStatement pstmt = conn.prepareStatement(
+	                    "INSERT INTO returns (return_ID, return_date, return_reason, bookstore_ID, return_status) VALUES (?, CURDATE(), ?, ?, ?)");
+	            pstmt.setString(1, return_ID);
+	            pstmt.setString(2, return_reason);
+	            pstmt.setString(3, bookstore_ID);
+	            pstmt.setString(4, this.return_status);
+	            pstmt.executeUpdate();
+	            pstmt.close();
+	        }
+
+	        PreparedStatement dStmt = conn.prepareStatement(
+	                "INSERT INTO return_details (return_ID, book_ID, publisher_ID, quantity_returned) VALUES (?, ?, ?, ?)");
+	        dStmt.setString(1, return_ID);
+	        dStmt.setInt(2, book_ID);
+	        dStmt.setInt(3, publisher_ID);
+	        dStmt.setInt(4, quantity_returned);
+	        dStmt.executeUpdate();
+	        dStmt.close();
+
+	        return 1; 
+
+	    } catch (Exception e) {
+	    	System.out.println(e.getMessage());
+	        return 0; 
+	    }
+	}
+
 		
 		public int update_returnRecord() {
 			try {
@@ -156,83 +161,132 @@ public class returnProcess {
 		}
 		
 		public int get_returnRecordByBook() {
-			int recordcount = 0;
-			try {
-				
-				
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
-				
-				 PreparedStatement pstmt = conn.prepareStatement(
-			                "SELECT r.return_ID, "
-			                + "		r.return_date, "
-			                + "		r.return_reason, "
-			                + "		r.return_status,"
-			                + "		rd.quantity_returned " 
-			                + "FROM returns r      JOIN return_details rd ON r.return_ID = rd.return_ID"
-			                + "                    JOIN publisher_books pb ON rd.book_ID = pb.book_ID"
-			                + "                    JOIN books b ON rd.book_ID = b.book_ID "
-			                + "WHERE b.book_ID = ?");
-			        pstmt.setInt(1, book_ID);
-			        
-				System.out.println("SQL Statement Prepared");
-				ResultSet rs = pstmt.executeQuery();
-				while (rs.next()) {
-					recordcount++;
-					return_ID		   = rs.getString("return_ID");
-					return_date 	   = rs.getString("return_date");
-					return_reason  	   = rs.getString("return_reason");
-					return_status	   = rs.getString("return_status");
-					quantity_returned  = rs.getInt("quantity_returned");
-					
-					System.out.println("Return Record was Retrieved");
-				}
-				pstmt.close();
-				conn.close();
-				return recordcount;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}
-		
-		public int get_returnRecordByPublisher() {
-			int recordcount = 0;
-			try {
-				Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
-				System.out.println("Connection to DB Successful");
+		    int recordCount = 0;
 
-				PreparedStatement pstmt = conn.prepareStatement(
-		                "SELECT r.return_ID, "
-		                + "		r.return_date, "
-		                + "		rd.book_ID, "
-		                + "		r.return_reason, "
-		                + "		r.return_status,"
-		                + "		rd.quantity_returned " 
-		                + "FROM returns r 		JOIN return_details rd ON r.return_ID = rd.return_ID " 
-		                + "WHERE rd.publisher_ID = ?");
+		    try (Connection conn = DriverManager.getConnection(
+		            "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+
+		        System.out.println("Connection to DB Successful");
+
+		        String query = """
+		                SELECT DISTINCT r.return_ID, 
+		                                r.return_date, 
+		                                r.return_reason, 
+		                                r.return_status,
+		                                rd.quantity_returned
+		                FROM returns r
+		                JOIN return_details rd ON r.return_ID = rd.return_ID
+		                JOIN publisher_books pb ON rd.book_ID = pb.book_ID
+		                JOIN books b ON rd.book_ID = b.book_ID
+		                WHERE b.book_ID = ?
+		                ORDER BY r.return_ID, r.return_date;
+		                """;
+
+		        PreparedStatement pstmt = conn.prepareStatement(query);
+		        pstmt.setInt(1, book_ID);
+
+		        System.out.println("SQL Statement Prepared");
+
+		        ResultSet rs = pstmt.executeQuery();
+
+		        System.out.println("Return Records for Book ID: " + book_ID);
+		        System.out.println("------------------------------------------------------");
+
+		        while (rs.next()) {
+		            recordCount++;
+		            String returnID = rs.getString("return_ID");
+		            String returnDate = rs.getString("return_date");
+		            String returnReason = rs.getString("return_reason");
+		            String returnStatus = rs.getString("return_status");
+		            int quantityReturned = rs.getInt("quantity_returned");
+
+		            // Display each unique record
+		            System.out.printf(
+		                "Return ID: %s, Date: %s, Reason: %s, Status: %s, Quantity Returned: %d%n",
+		                returnID, returnDate, returnReason, returnStatus, quantityReturned
+		            );
+		        }
+
+		        if (recordCount == 0) {
+		            System.out.println("No return records found for the specified book.");
+		        }
+
+		        System.out.println("------------------------------------------------------");
+		        rs.close();
+		        pstmt.close();
+
+		    } catch (Exception e) {
+		        System.out.println("Error: " + e.getMessage());
+		        return 0; // Return 0 for failure
+		    }
+
+		    System.out.println("Total Records Found: " + recordCount);
+		    return recordCount; // Return the number of records found
+		}
+
+		public int get_returnRecordByPublisher() {
+		    int recordCount = 0;
+
+		    try (Connection conn = DriverManager.getConnection(
+		            "jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+
+		        System.out.println("Connection to DB Successful");
+
+		        String query = """
+		                SELECT DISTINCT r.return_ID, 
+		                                r.return_date, 
+		                                rd.book_ID, 
+		                                r.return_reason, 
+		                                r.return_status,
+		                                rd.quantity_returned
+		                FROM returns r
+		                JOIN return_details rd ON r.return_ID = rd.return_ID
+		                WHERE rd.publisher_ID = ?
+		                ORDER BY r.return_ID, r.return_date;
+		                """;
+
+		        PreparedStatement pstmt = conn.prepareStatement(query);
 		        pstmt.setInt(1, publisher_ID);
-		        
-				System.out.println("SQL Statement Prepared");
-				ResultSet rs = pstmt.executeQuery();
-				while (rs.next()) {
-					recordcount++;
-					return_ID		   = rs.getString("return_ID");
-					return_date 	   = rs.getString("return_date");
-					book_ID			   = rs.getInt("book_ID");
-					return_reason  	   = rs.getString("return_reason");
-					return_status	   = rs.getString("return_status");
-					quantity_returned  = rs.getInt("quantity_returned");
-					
-					System.out.println("Return Record was Retrieved");
-				}
-				pstmt.close();
-				conn.close();
-				return recordcount;
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				return 0;
-			}
-		}		
+
+		        System.out.println("SQL Statement Prepared");
+
+		        ResultSet rs = pstmt.executeQuery();
+
+		        System.out.println("Return Records for Publisher ID: " + publisher_ID);
+		        System.out.println("------------------------------------------------------");
+
+		        while (rs.next()) {
+		            recordCount++;
+		            String returnID = rs.getString("return_ID");
+		            String returnDate = rs.getString("return_date");
+		            int bookID = rs.getInt("book_ID");
+		            String returnReason = rs.getString("return_reason");
+		            String returnStatus = rs.getString("return_status");
+		            int quantityReturned = rs.getInt("quantity_returned");
+
+		            // Display each unique record
+		            System.out.printf(
+		                "Return ID: %s, Date: %s, Book ID: %d, Reason: %s, Status: %s, Quantity Returned: %d%n",
+		                returnID, returnDate, bookID, returnReason, returnStatus, quantityReturned
+		            );
+		        }
+
+		        if (recordCount == 0) {
+		            System.out.println("No return records found for the specified publisher.");
+		        }
+
+		        System.out.println("------------------------------------------------------");
+		        rs.close();
+		        pstmt.close();
+
+		    } catch (Exception e) {
+		        System.out.println("Error: " + e.getMessage());
+		        return 0; // Return 0 for failure
+		    }
+
+		    System.out.println("Total Records Found: " + recordCount);
+		    return recordCount; // Return the number of records found
+		}
+
 }
 
