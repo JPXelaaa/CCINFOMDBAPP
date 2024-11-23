@@ -199,8 +199,7 @@ public class returnProcess {
 		            String returnReason = rs.getString("return_reason");
 		            String returnStatus = rs.getString("return_status");
 		            int quantityReturned = rs.getInt("quantity_returned");
-
-		            // Display each unique record
+		            
 		            System.out.printf(
 		                "Return ID: %s, Date: %s, Reason: %s, Status: %s, Quantity Returned: %d%n",
 		                returnID, returnDate, returnReason, returnStatus, quantityReturned
@@ -217,11 +216,11 @@ public class returnProcess {
 
 		    } catch (Exception e) {
 		        System.out.println("Error: " + e.getMessage());
-		        return 0; // Return 0 for failure
+		        return 0;
 		    }
 
 		    System.out.println("Total Records Found: " + recordCount);
-		    return recordCount; // Return the number of records found
+		    return recordCount; 
 		}
 
 		public int get_returnRecordByPublisher() {
@@ -264,7 +263,6 @@ public class returnProcess {
 		            String returnStatus = rs.getString("return_status");
 		            int quantityReturned = rs.getInt("quantity_returned");
 
-		            // Display each unique record
 		            System.out.printf(
 		                "Return ID: %s, Date: %s, Book ID: %d, Reason: %s, Status: %s, Quantity Returned: %d%n",
 		                returnID, returnDate, bookID, returnReason, returnStatus, quantityReturned
@@ -281,11 +279,11 @@ public class returnProcess {
 
 		    } catch (Exception e) {
 		        System.out.println("Error: " + e.getMessage());
-		        return 0; // Return 0 for failure
+		        return 0; 
 		    }
 
 		    System.out.println("Total Records Found: " + recordCount);
-		    return recordCount; // Return the number of records found
+		    return recordCount;
 		}
 
 }
