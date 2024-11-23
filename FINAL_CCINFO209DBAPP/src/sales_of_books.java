@@ -123,13 +123,41 @@ public class sales_of_books {
 	    this.shipped_date = now.plusDays(1);
 	}
 
+	
+	public int getStockQuantity(int bookID, int publisherID) {
+	    String query 						= "SELECT stock_quantity FROM publisher_books WHERE book_ID = ? AND publisher_ID = ?";
+
+	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!");
+	         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+	        stmt.setInt(1, bookID);
+	        stmt.setInt(2, publisherID);
+	        ResultSet rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            return rs.getInt("stock_quantity");
+	        } else {
+	            System.out.println("Error: No record found for book_ID: " + bookID + " and publisher_ID: " + publisherID);
+	            return -1;
+	        }
+
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving stock quantity: " + e.getMessage());
+	        return -1;
+	    }
+	}
 	public String addNewOrderRecord() {
-	    this.order_number 		   			= generateOrderNumber();
+	    this.order_number = generateOrderNumber();
 	    generateDates();
-	    this.status 						= "Processing";
-
-	    String insertOrderQuery 			= "INSERT INTO orders (order_number, bookstore_ID, order_date, required_date, shipped_date, status, remarks) VALUES (?,?,?,?,?,?,?)";
-
+	    this.status = "Processing";
+	    String insertOrderQuery 				= "INSERT INTO orders (order_number, bookstore_ID, order_date, required_date, shipped_date, status, remarks) VALUES (?,?,?,?,?,?,?)";
+	    
+	    if (!checkBookUnderPublisher(bookID, publisherID)) {
+	        System.out.println("Error: The book_ID and publisher_ID pair does not exist in publisher_books. Order creation aborted.");
+	        return null;
+	    }
+	    
+	   
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
 	        PreparedStatement orderStmt = conn.prepareStatement(insertOrderQuery);
 	        orderStmt.setString(1, order_number);
@@ -140,58 +168,44 @@ public class sales_of_books {
 	        orderStmt.setString(6, status);
 	        orderStmt.setString(7, remarks);
 	        orderStmt.executeUpdate();
+
 	        System.out.println("New order record created: " + order_number);
 	        return order_number;
-	    } catch (Exception e) {
+
+	    } catch (SQLException e) {
 	        System.out.println("Error creating order: " + e.getMessage());
 	        return null;
 	    }
 	}
-	
-	
+
 	public void addOrderDetails(String orderNumber) {
-	    String checkStockQuantityQuery 		= "SELECT stock_quantity FROM publisher_books WHERE book_ID = ? AND publisher_ID = ?";
-	    String insertOrderDetailsQuery 		= "INSERT INTO order_details (order_number, book_ID, publisher_ID, quantity_ordered) VALUES (?,?,?,?)";
-	    String updateBookStockQuery 		= "UPDATE publisher_books SET stock_quantity = stock_quantity - ? WHERE book_ID = ? AND publisher_ID = ?";
+	    String insertOrderDetailsQuery 			= "INSERT INTO order_details (order_number, book_ID, publisher_ID, quantity_ordered) VALUES (?,?,?,?)";
+	    String updateBookStockQuery 			= "UPDATE publisher_books SET stock_quantity = stock_quantity - ? WHERE book_ID = ? AND publisher_ID = ?";
 
+	    if (!checkBookUnderPublisher(bookID, publisherID)) {
+	        System.out.println("Error: The book_ID and publisher_ID pair does not exist. Order details cannot be added.");
+	        return;
+	    }
+	    
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
-	        // Check the stock quantity for the book and publisher
-	        PreparedStatement checkStockStmt = conn.prepareStatement(checkStockQuantityQuery);
-	        checkStockStmt.setInt(1, bookID);
-	        checkStockStmt.setInt(2, publisherID);
-	        ResultSet stockResult = checkStockStmt.executeQuery();
-
-	        if (stockResult.next()) {
-	            int stockQuantity = stockResult.getInt("stock_quantity");
-	            if (quantity_ordered > stockQuantity) {
-	                System.out.println("Error: Quantity ordered exceeds stock quantity. Available stock: " + stockQuantity);
-	                return;
-	            }
-	        } else {
-	            System.out.println("Error: No record found in publisher_books for the given book_ID and publisher_ID.");
-	            return;
-	        }
-
 	        PreparedStatement detailsStmt = conn.prepareStatement(insertOrderDetailsQuery);
 	        detailsStmt.setString(1, orderNumber);
 	        detailsStmt.setInt(2, bookID);
 	        detailsStmt.setInt(3, publisherID);
 	        detailsStmt.setInt(4, quantity_ordered);
 	        detailsStmt.executeUpdate();
-	        System.out.println("Order details added for order_number: " + orderNumber);
 
 	        PreparedStatement stockStmt = conn.prepareStatement(updateBookStockQuery);
 	        stockStmt.setInt(1, quantity_ordered);
 	        stockStmt.setInt(2, bookID);
 	        stockStmt.setInt(3, publisherID);
 	        stockStmt.executeUpdate();
-	        System.out.println("Stock updated for book_ID: " + bookID + ", publisher_ID: " + publisherID);
 
-	    } catch (Exception e) {
+	    } catch (SQLException e) {
 	        System.out.println("Error adding order details: " + e.getMessage());
 	    }
 	}
-		
+
 		
 	public void delete_orderRecord(String order_number) {
 	    String checkStatusQuery 		    = "SELECT status FROM orders WHERE order_number = ?";
