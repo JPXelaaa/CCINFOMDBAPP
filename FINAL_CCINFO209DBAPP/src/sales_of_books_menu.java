@@ -9,58 +9,88 @@ public class sales_of_books_menu {
         int menuSelection = 0;
         Scanner sc = new Scanner(System.in);
 
-        while (menuSelection != 4) {
+        while (menuSelection != 5) {
             System.out.println(" ");
             System.out.println(" ");
             System.out.println("=======================================================");
             System.out.println("    Order Records Menu");
             System.out.println("-------------------------------------------------------");
             System.out.println("[1] Create Purchase Record");
-            System.out.println("[2] View Purchase Record");
+            System.out.println("[2] View Purchase Record  ");
             System.out.println("[3] Update Status of Order");
-            System.out.println("[4] Exit Orders Management");
+            System.out.println("[4] Delete Order		  ");
+            System.out.println("[5] Exit Orders Management");
             System.out.println("=======================================================");
 
             System.out.print("Enter Selected Function: ");
             menuSelection = Integer.parseInt(sc.nextLine());
 
             sales_of_books sb = new sales_of_books();
+          
 
             switch (menuSelection) {
-                case 1:
-                	System.out.println("Would you like to see existing Book IDs? (y/n): ");
-                    if (sc.nextLine().equalsIgnoreCase("y")) {
-                        sb.displayBooksPublishersAndStock();
-                    }
-            	
-                	System.out.println("Would you like to see existing Bookstore IDs? (y/n): ");
-                	if (sc.nextLine().equalsIgnoreCase("y")) {
-                	    System.out.println(" ");
-                	    System.out.println(" ");
-                	    sb.displayExistingBookstoreIDs();
-                	}
-                   
+            case 1:
+                boolean addMoreBooks = true;
+                String currentOrderNumber = null;
+
+                System.out.println("Would you like to see existing Book IDs? (y/n): ");
+                if (sc.nextLine().equalsIgnoreCase("y")) {
+                    sb.displayBooksPublishersAndStock();
+                }
+
+                System.out.println("Would you like to see existing Bookstore IDs? (y/n): ");
+                if (sc.nextLine().equalsIgnoreCase("y")) {
+                    System.out.println(" ");
+                    System.out.println(" ");
+                    sb.displayExistingBookstoreIDs();
+                }
+
+                while (addMoreBooks) {
                     System.out.println(" ");
                     System.out.println(" ");
                     System.out.println("Enter Purchase Information:");
+
                     System.out.print("BookID: ");
                     sb.bookID = Integer.parseInt(sc.nextLine());
+
                     System.out.print("PublisherID: ");
                     sb.publisherID = Integer.parseInt(sc.nextLine());
-                    System.out.print("BookstoreID: ");
-                    sb.bookstoreID = sc.nextLine();
+
+                    if (!sb.checkBookUnderPublisher(sb.bookID, sb.publisherID)) {
+                        System.out.println("Invalid PublisherID. Aborting...");
+                        break;
+                    }
+
+                    if (currentOrderNumber == null) {
+                        System.out.print("BookstoreID: ");
+                        sb.bookstoreID = sc.nextLine();
+
+                        System.out.print("Remarks: ");
+                        sb.remarks = sc.nextLine();
+
+                        if (sb.check_book(sb.bookID) && sb.check_bookstore(sb.bookstoreID) && sb.check_publisher(sb.publisherID)) {
+                            currentOrderNumber = sb.addNewOrderRecord();
+                        } else {
+                            System.out.println("Invalid BookID, PublisherID, or BookstoreID. Aborting...");
+                            break;
+                        }
+                    } else {
+                        System.out.println("Adding to existing order: " + currentOrderNumber);
+                    }
+
                     System.out.print("Quantity: ");
                     sb.quantity_ordered = Integer.parseInt(sc.nextLine());
-                    System.out.print("Remarks: ");
-                    sb.remarks = sc.nextLine();
 
-                    if (sb.check_book(sb.bookID) && sb.check_bookstore(sb.bookstoreID) && sb.check_publisher(sb.publisherID)) {
-                        sb.add_orderRecord();
+                    if (sb.check_book(sb.bookID) && sb.check_publisher(sb.publisherID)) {
+                        sb.addOrderDetails(currentOrderNumber);
                     } else {
-                        System.out.println("BookID/PublisherID/BookstoreID does not exist. Purchase Order addition aborted.");
+                        System.out.println("Invalid BookID or PublisherID. Aborting...");
                     }
-                    break;
 
+                    System.out.print("Would you like to add another book to this order? (y/n): ");
+                    addMoreBooks = sc.nextLine().equalsIgnoreCase("y");
+                }
+                break;
                 case 2:
                     System.out.println(" ");
                     System.out.println("=======================================================");
@@ -130,8 +160,20 @@ public class sales_of_books_menu {
 
                     sb.updateOrderStatus(sb.order_number, sb.status);
                     break;
-
+                    
                 case 4:
+                    System.out.println("Would you like to see existing Order Numbers? (y/n): ");
+                    if (sc.nextLine().equalsIgnoreCase("y")) {
+                        sb.displayExistingOrderNumbers();
+                    }
+                    
+                    System.out.print("Enter Order Number: ");
+                    sb.order_number = sc.nextLine();
+                    
+                    sb.delete_orderRecord(sb.order_number);
+                    break;
+
+                case 5:
                     System.out.println("Exiting Orders Management...");
                     break;
 
