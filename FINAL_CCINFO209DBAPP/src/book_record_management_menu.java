@@ -86,7 +86,7 @@ public class book_record_management_menu {
                         System.out.println("Title               : ");         bm.title = sc.nextLine();
 
 
-                        System.out.println("Authors (comma-separated, must already exist): ");
+                        System.out.println("Authors (comma-separated): ");
                         String[] updatedAuthors = sc.nextLine().split(",");
                         if (!bm.check_authors(updatedAuthors)) {
                             System.out.println("One or more authors do not exist. Update aborted.");
@@ -94,7 +94,7 @@ public class book_record_management_menu {
                         }
 
 
-                        System.out.println("Genres (comma-separated, must already exist): ");
+                        System.out.println("Genres (comma-separated): ");
                         String[] updatedGenres = sc.nextLine().split(",");
                         if (!bm.check_genres(updatedGenres)) {
                             System.out.println("One or more genres do not exist. Update aborted.");
