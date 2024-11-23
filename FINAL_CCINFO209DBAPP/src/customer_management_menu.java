@@ -28,17 +28,17 @@ public class customer_management_menu {
 			customer_management c = new customer_management();
 			switch (menuselection) 
 			{
-				case 1: // adding a new Records, ask the user for the values of the record fields
+				case 1: 
 					
 					System.out.println ("Enter customer information");
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();
 					System.out.println ("Bookstore Name      : ");  c.bookstore_name  		 = console.nextLine();
 					System.out.println ("Contact First Name  : ");  c.contact_firstName  	 = console.nextLine();
 					System.out.println ("Contact Last Name   : ");  c.contact_lastName 		 = console.nextLine();
-					System.out.println ("Phone Number 		 : ");  c.phone_number 			 = console.nextLine();
+					System.out.println ("Phone Number 	    : ");  c.phone_number 			 = console.nextLine();
 					System.out.println ("Address Line 1      : ");  c.addressLine1      	 = console.nextLine();
-					System.out.println ("Address Line 2    	 : ");  c.addressLine2    		 = console.nextLine();
-					System.out.println ("City           	 : ");  c.city		           	 = console.nextLine();
+					System.out.println ("Address Line 2      : ");  c.addressLine2    		 = console.nextLine();
+					System.out.println ("City           	    : ");  c.city		           	 = console.nextLine();
 					
 					c.add_customer();
 					break;
@@ -51,7 +51,7 @@ public class customer_management_menu {
 					if (c.get_customer()==0) {
 						break;
 					} else {
-						System.out.println ("Current Customer information");
+						System.out.println ("Current Customer Information");
 						System.out.println ("-------------------------------------------------------------------");
 						System.out.println ("Bookstore ID		: " + c.bookstore_ID);
 						System.out.println ("Bookstore Name     	: " + c.bookstore_name);
@@ -65,11 +65,11 @@ public class customer_management_menu {
 						System.out.println ("Enter updated customer information");
 						System.out.println ("-------------------------------------------------------------------");
 						System.out.println ("Bookstore Name        	: ");  c.bookstore_name  	= console.nextLine();
-						System.out.println ("Contact First Name     : ");  c.contact_firstName 	= console.nextLine();
+						System.out.println ("Contact First Name      : ");  c.contact_firstName 	= console.nextLine();
 						System.out.println ("Contact Last Name  	: ");  c.contact_lastName 	= console.nextLine();
-						System.out.println ("Phone Number      		: ");  c.phone_number      	= console.nextLine();
-						System.out.println ("Address Line 1    		: ");  c.addressLine1    	= console.nextLine();
-						System.out.println ("Address Line 2         : ");  c.addressLine2       = console.nextLine();
+						System.out.println ("Phone Number      	: ");  c.phone_number      	= console.nextLine();
+						System.out.println ("Address Line 1    	: ");  c.addressLine1    	= console.nextLine();
+						System.out.println ("Address Line 2          : ");  c.addressLine2       = console.nextLine();
 						System.out.println ("City                	: ");  c.city 				= console.nextLine();		
 					
 						c.update_customer();
@@ -90,7 +90,7 @@ public class customer_management_menu {
 					System.out.println ("Bookstore ID        : ");  c.bookstore_ID  		 = console.nextLine();		
 
 					if (c.get_customer() == 1) {
-					System.out.println ("Current Customer information");
+					System.out.println ("Current Customer Information");
 					System.out.println ("-------------------------------------------------------------------");
 					System.out.println ("Bookstore ID       : " + c.bookstore_ID);
 					System.out.println ("Bookstore Name     : " + c.bookstore_name);
