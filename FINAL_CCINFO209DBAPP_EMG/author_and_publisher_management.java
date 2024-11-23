@@ -366,7 +366,7 @@ public class author_and_publisher_management {
             System.out.println("Connection to DB Successful");
 
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM publishers WHERE publisher_ID = ?");
-            pstmt.setString(1, publisherName);
+            pstmt.setInt(1, publisherID);
             pstmt.executeUpdate();
             System.out.println("Publisher record deleted");
 
@@ -388,9 +388,9 @@ public class author_and_publisher_management {
 	
 	             // Check if the publisher exists
 	             PreparedStatement checkStmt = conn.prepareStatement(
-	                 "SELECT COUNT(*) AS count FROM publishers WHERE publisher_name=?"
+	                 "SELECT COUNT(*) AS count FROM publishers WHERE publisher_ID=?"
 	             );
-	             checkStmt.setString(1, publisherName);
+	             checkStmt.setInt(1, publisherID);
 	             ResultSet r = checkStmt.executeQuery();
 	             r.next();
 	             int count = r.getInt("count");
