@@ -142,7 +142,7 @@ public class sales_of_books {
 	        orderStmt.executeUpdate();
 	        System.out.println("New order record created: " + order_number);
 	        return order_number;
-	    } catch (SQLException e) {
+	    } catch (Exception e) {
 	        System.out.println("Error creating order: " + e.getMessage());
 	        return null;
 	    }
@@ -150,15 +150,28 @@ public class sales_of_books {
 	
 	
 	public void addOrderDetails(String orderNumber) {
-	    if (!checkBookUnderPublisher(bookID, publisherID)) {
-	        System.out.println("Error: The book_ID and publisher_ID pair does not exist in publisher_books. Order details cannot be added.");
-	        return;
-	    }
-
+	    String checkStockQuantityQuery 		= "SELECT stock_quantity FROM publisher_books WHERE book_ID = ? AND publisher_ID = ?";
 	    String insertOrderDetailsQuery 		= "INSERT INTO order_details (order_number, book_ID, publisher_ID, quantity_ordered) VALUES (?,?,?,?)";
 	    String updateBookStockQuery 		= "UPDATE publisher_books SET stock_quantity = stock_quantity - ? WHERE book_ID = ? AND publisher_ID = ?";
 
 	    try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")) {
+	        // Check the stock quantity for the book and publisher
+	        PreparedStatement checkStockStmt = conn.prepareStatement(checkStockQuantityQuery);
+	        checkStockStmt.setInt(1, bookID);
+	        checkStockStmt.setInt(2, publisherID);
+	        ResultSet stockResult = checkStockStmt.executeQuery();
+
+	        if (stockResult.next()) {
+	            int stockQuantity = stockResult.getInt("stock_quantity");
+	            if (quantity_ordered > stockQuantity) {
+	                System.out.println("Error: Quantity ordered exceeds stock quantity. Available stock: " + stockQuantity);
+	                return;
+	            }
+	        } else {
+	            System.out.println("Error: No record found in publisher_books for the given book_ID and publisher_ID.");
+	            return;
+	        }
+
 	        PreparedStatement detailsStmt = conn.prepareStatement(insertOrderDetailsQuery);
 	        detailsStmt.setString(1, orderNumber);
 	        detailsStmt.setInt(2, bookID);
@@ -174,7 +187,7 @@ public class sales_of_books {
 	        stockStmt.executeUpdate();
 	        System.out.println("Stock updated for book_ID: " + bookID + ", publisher_ID: " + publisherID);
 
-	    } catch (SQLException e) {
+	    } catch (Exception e) {
 	        System.out.println("Error adding order details: " + e.getMessage());
 	    }
 	}
@@ -223,8 +236,7 @@ public class sales_of_books {
 	            updateStockStmt.setInt(2, bookID);
 	            updateStockStmt.setInt(3, publisherID);
 	            updateStockStmt.executeUpdate();
-	            System.out.println("Stock updated for book_ID: " + bookID + ", publisher_ID: " + publisherID);
-	        }
+	            }
 
 	        PreparedStatement deleteOrderDetailsStmt = conn.prepareStatement(deleteOrderDetailsQuery);
 	        deleteOrderDetailsStmt.setString(1, order_number);
