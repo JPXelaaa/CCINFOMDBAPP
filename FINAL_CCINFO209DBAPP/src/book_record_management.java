@@ -174,9 +174,9 @@ public class book_record_management {
 
     public void delete_book(){
         String deletePublisherBooksQuery = "DELETE FROM publisher_books WHERE book_ID = ?";
-        String deleteQuery 			= "DELETE FROM books WHERE book_ID = ?";
-        String deleteAuthorsQuery 	= "DELETE FROM book_authors WHERE book_ID = ?";
-        String deleteGenresQuery 	= "DELETE FROM book_genres WHERE book_ID = ?";
+        String deleteQuery 				 = "DELETE FROM books WHERE book_ID = ?";
+        String deleteAuthorsQuery 		 = "DELETE FROM book_authors WHERE book_ID = ?";
+        String deleteGenresQuery 		 = "DELETE FROM book_genres WHERE book_ID = ?";
         
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://34.57.40.219:3306/CCINFO209DB?useTimezone=true&serverTimezone=UTC&user=root&password=DLSU1234!")){
             System.out.println("Connected to the database successfully");
