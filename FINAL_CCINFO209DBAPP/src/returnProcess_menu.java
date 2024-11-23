@@ -1,11 +1,13 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Scanner;
 
 public class returnProcess_menu {
-
 	public returnProcess_menu() {
+		}
 		
-	}
-	
 	public int menu() {
 		int menuselection;
 		Scanner console = new Scanner(System.in);
@@ -30,17 +32,46 @@ public class returnProcess_menu {
 			switch (menuselection) 
 			{
 				case 1: 
+					boolean isFirstReturn = true;
+				    int returnCount = 0; 
+
+				    System.out.println("Enter Return Information");
+				    System.out.print("Return ID            : "); 	rp.return_ID = console.nextLine();
+				    System.out.print("Return Reason        : ");	rp.return_reason = console.nextLine();
+				    System.out.print("Bookstore ID         : ");	rp.bookstore_ID = console.nextLine();
+
+				    boolean addMoreBooks = true;
+
+				    while (addMoreBooks) {
+				        System.out.print("Book ID              : ");	rp.book_ID = Integer.parseInt(console.nextLine());
+				        System.out.print("Publisher ID         : ");	rp.publisher_ID = Integer.parseInt(console.nextLine());
+				        System.out.print("Quantity Returned    : ");	rp.quantity_returned = Integer.parseInt(console.nextLine());
+
+				        int result = rp.add_returnRecord(isFirstReturn);
+
+				        if (result == 1) {
+				            System.out.println("Book return details added successfully.");
+				            returnCount++;
+				            isFirstReturn = false; 
+				        } else if (result == -1) {
+				            System.out.println("Error: Quantity returned exceeds the quantity ordered. Try again.");
+				        } else {
+				            System.out.println("Error occurred while processing the return.");
+				        }
+
+				        System.out.print("Return another book? [1] Yes [2] No: ");
+				        int choice = Integer.parseInt(console.nextLine());
+				        if (choice != 1) {
+				            addMoreBooks = false; 
+				        }
+				    }
+
+				    if (returnCount > 0) {
+				        System.out.println("Return record and details were created successfully.");
+				    } else {
+				        System.out.println("No record was created.");
+				    }
 					
-					System.out.println ("Enter Return information");
-					System.out.println ("Return ID	         : ");  rp.return_ID  	 	 = console.nextLine();
-					System.out.println ("Return_reason       : ");  rp.return_reason  	 = console.nextLine();
-					System.out.println ("Bookstore_ID 		 : ");  rp.bookstore_ID  	 = console.nextLine();
-					System.out.println ("Book ID   			 : ");  rp.book_ID	 		 = Integer.parseInt(console.nextLine());
-					System.out.println ("Publisher ID		 : ");  rp.publisher_ID 	 = Integer.parseInt(console.nextLine());
-					System.out.println ("Quantity Returned   : ");  rp.quantity_returned = Integer.parseInt(console.nextLine());
-					
-					
-					rp.add_returnRecord();
 					break;
 					
 				case 2:
@@ -50,16 +81,7 @@ public class returnProcess_menu {
 		
 					if (rp.get_returnRecordByBook()==0) {
 						break;
-					} else {
-						System.out.println ("Current Return information");
-						System.out.println ("-------------------------------------------------------------------");
-						System.out.println ("Return ID        	: " + rp.return_ID);
-						System.out.println ("Return Date     	: " + rp.return_date);
-						System.out.println ("Return Reason 		: " + rp.return_reason);
-						System.out.println ("Return Status		: " + rp.return_status);
-						System.out.println ("Quantity Returned  	: " + rp.quantity_returned);
-			
-					}
+					} 
 					break;
 					
 				case 3: 
@@ -67,28 +89,23 @@ public class returnProcess_menu {
 					System.out.println ("Enter Return information");
 					System.out.println ("Publisher ID	: ");  rp.publisher_ID = Integer.parseInt(console.nextLine());		
 
-					if (rp.get_returnRecordByPublisher() == 1) {
-					System.out.println ("Current Return information");
-					System.out.println ("-------------------------------------------------------------------");
-					System.out.println ("Return ID      	  	: " + rp.return_ID);
-					System.out.println ("Return Date        	: " + rp.return_date);
-					System.out.println ("Book ID		     	: " + rp.book_ID);
-					System.out.println ("Return Reason      	: " + rp.return_reason);
-					System.out.println ("Return Status		: " + rp.return_status);
-					System.out.println ("Quantity Returned 	: " + rp.quantity_returned);
+					if (rp.get_returnRecordByPublisher()==0) {
+						break;
 					}
-					
-					else 
-						return 0;
 					
 					break;
 				
 				case 4:
 					System.out.println ("Enter Return information");
 					System.out.println ("Return ID	: ");  rp.return_ID = console.nextLine();	
-					System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
 					
-					rp.update_returnRecord();
+					if (rp.returnIDChoice() == 1) {
+						System.out.println ("New Return Status: "); rp.return_status = console.nextLine();
+						rp.update_returnRecord(); 
+					} else {
+						return 0;
+					}
+						
 					break;
 					
 				case 5:
@@ -96,7 +113,12 @@ public class returnProcess_menu {
 					System.out.println ("Enter return information");
 					System.out.println ("Return ID        : ");  rp.return_ID  = console.nextLine();		
 					
-					rp.delete_returnRecord();
+					if (rp.returnIDChoice() == 1) {
+						rp.delete_returnRecord();
+					} else {
+						return 0;
+					}
+					
 					break;
 					
 					
