@@ -219,7 +219,7 @@ public class author_and_publisher_management_view {
                 }
                 System.out.println("Current Publisher information");
                 System.out.println("-------------------------------------------------------------------");
-                System.out.println("Publisher ID					 : " + apm.publisherID);
+                System.out.println("Publisher ID				 : " + apm.publisherID);
                 System.out.println("Publisher Name        			 : " + apm.publisherName);
                 System.out.println("Publisher Address Line 1        	 : " + apm.publisherAddressLine1);
                 System.out.println("Publisher Address Line 2    	 	 : " + apm.publisherAddressLine2);
