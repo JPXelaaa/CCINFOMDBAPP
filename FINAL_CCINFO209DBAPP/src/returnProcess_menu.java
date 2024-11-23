@@ -34,16 +34,42 @@ public class returnProcess_menu {
 				case 1: 
 					boolean isFirstReturn = true;
 				    int returnCount = 0; 
-
+				    
 				    System.out.println("Enter Return Information");
+				    
+				    System.out.println("Would you like to view the list of Return IDs? [1] Yes / [2] No");
+				    int choice = Integer.parseInt(console.nextLine());
+					    if (choice == 1) {
+					    	rp.displayExistingReturnIDs(); 
+				        } 
 				    System.out.print("Return ID            : "); 	rp.return_ID = console.nextLine();
 				    System.out.print("Return Reason        : ");	rp.return_reason = console.nextLine();
+				    
+				    System.out.println("Would you like to view the list of Bookstore IDs? [1] Yes / [2] No");
+				    choice = Integer.parseInt(console.nextLine());
+					    if (choice == 1) {
+					    	rp.displayExistingBookstoreIDs(); 
+				        } 
 				    System.out.print("Bookstore ID         : ");	rp.bookstore_ID = console.nextLine();
 
 				    boolean addMoreBooks = true;
 
+
+				    
 				    while (addMoreBooks) {
+				    	System.out.println("Would you like to view the list of BookIDs under each Bookstore? [1] Yes / [2] No");
+					    choice = Integer.parseInt(console.nextLine());
+						    if (choice == 1) {
+						    	rp.displayExistingBookIDsUnderBookstore(); 
+					        } 
 				        System.out.print("Book ID              : ");	rp.book_ID = Integer.parseInt(console.nextLine());
+				        
+				        
+				        System.out.println("Would you like to view the list of publisher? [1] Yes / [2] No");
+					    choice = Integer.parseInt(console.nextLine());
+						    if (choice == 1) {
+						    	rp.displayExistingPublisherIDs(); 
+					        } 
 				        System.out.print("Publisher ID         : ");	rp.publisher_ID = Integer.parseInt(console.nextLine());
 				        System.out.print("Quantity Returned    : ");	rp.quantity_returned = Integer.parseInt(console.nextLine());
 
@@ -60,7 +86,7 @@ public class returnProcess_menu {
 				        }
 
 				        System.out.print("Return another book? [1] Yes [2] No: ");
-				        int choice = Integer.parseInt(console.nextLine());
+				        choice = Integer.parseInt(console.nextLine());
 				        if (choice != 1) {
 				            addMoreBooks = false; 
 				        }
@@ -75,8 +101,8 @@ public class returnProcess_menu {
 					break;
 					
 				case 2:
-					
-					System.out.println ("Enter Return information");
+					rp.displayExistingBookIDs();
+					System.out.println ("\nEnter Return information");
 					System.out.println ("Book ID 	: ");  rp.book_ID = Integer.parseInt(console.nextLine());
 		
 					if (rp.get_returnRecordByBook()==0) {
@@ -85,7 +111,7 @@ public class returnProcess_menu {
 					break;
 					
 				case 3: 
-					
+					rp.displayExistingPublisherIDs();
 					System.out.println ("Enter Return information");
 					System.out.println ("Publisher ID	: ");  rp.publisher_ID = Integer.parseInt(console.nextLine());		
 
@@ -96,6 +122,7 @@ public class returnProcess_menu {
 					break;
 				
 				case 4:
+					rp.displayExistingReturnIDs();
 					System.out.println ("Enter Return information");
 					System.out.println ("Return ID	: ");  rp.return_ID = console.nextLine();	
 					
@@ -109,7 +136,7 @@ public class returnProcess_menu {
 					break;
 					
 				case 5:
-					
+					rp.displayExistingReturnIDs();
 					System.out.println ("Enter return information");
 					System.out.println ("Return ID        : ");  rp.return_ID  = console.nextLine();		
 					
@@ -120,7 +147,6 @@ public class returnProcess_menu {
 					}
 					
 					break;
-					
 					
 				case 0:
 					break;
